@@ -59,7 +59,7 @@ class LandingPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // Display image from assets
-            git SizedBox(
+            SizedBox(
               width: double.infinity,
               height:
                   MediaQuery.of(context).size.height *
