@@ -114,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                     // --- SOS Button ---
                     Center(
                       child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/map_tracking'),
+                        onTap: () => Navigator.pushNamed(context, '/map_tracking_screen'),
                         child: Container(
                           width: 220,
                           height: 220,

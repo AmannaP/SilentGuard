@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: TextButton(
                   onPressed: () {
                     // Your login logic here
-                    Navigator.pushNamed(context, '/home_page');
+                    Navigator.pushNamed(context, '/home_screen');
                     // Navigator.pushReplacementNamed(context, '/home');
                   },
                   child: Row(
