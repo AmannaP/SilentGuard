@@ -59,6 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
       body: SafeArea(
         child: Column(
           children: [
+<<<<<<< HEAD
             const SizedBox(height: 20),
             // Logo Placeholder (Replace with your Image.asset)
             const CircleAvatar(
@@ -67,6 +68,23 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Icon(Icons.shield, color: Colors.white, size: 40),
             ),
             const SizedBox(height: 10),
+=======
+            Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            const SizedBox(height: 5),
+            // Logo Placeholder (Replace with your Image.asset)
+            const CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.black,
+              child: Icon(Icons.shield, color: Colors.white, size: 30),
+            ),
+            const SizedBox(height: 5),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             const Text(
               "Welcome to SilentGuard",
               style: TextStyle(
@@ -98,7 +116,11 @@ class _SignUpPageState extends State<SignUpPage> {
   // --- PAGE 1: Personal Info & Password ---
   Widget _buildPageOne() {
     return SingleChildScrollView(
+<<<<<<< HEAD
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+=======
+      padding: const EdgeInsets.fromLTRB(30, 20, 30, 100),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       child: Column(
         children: [
           _buildTextField("First Name", _firstNameController),
@@ -133,7 +155,11 @@ class _SignUpPageState extends State<SignUpPage> {
   // --- PAGE 2: Demographics & Emergency ---
   Widget _buildPageTwo() {
     return SingleChildScrollView(
+<<<<<<< HEAD
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+=======
+      padding: const EdgeInsets.fromLTRB(30, 20, 30, 100),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -183,6 +209,7 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
 
           const SizedBox(height: 30),
+<<<<<<< HEAD
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -195,6 +222,33 @@ class _SignUpPageState extends State<SignUpPage> {
                 style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),
+=======
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Internal Back Button (Page 2 -> Page 1)
+              TextButton(
+                onPressed: () => _pageController.previousPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                ),
+                child: const Text(
+                  "< Back",
+                  style: TextStyle(color: Colors.white70, fontSize: 18),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Handle Finish Logic
+                  Navigator.pushNamed(context, '/login_page');
+                },
+                child: const Text(
+                  "Finish >",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ),
+            ],
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ),
         ],
       ),

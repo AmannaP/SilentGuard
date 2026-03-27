@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 
+=======
+import '../widgets/custom_bottom_nav_bar.dart';
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA MODELS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -17,11 +21,23 @@ class CaseUpdate {
 }
 
 class CaseMedia {
+<<<<<<< HEAD
   final String type;   // 'image' | 'voice' | 'document'
   final String label;
   final String size;
 
   const CaseMedia({required this.type, required this.label, required this.size});
+=======
+  final String type; // 'image' | 'voice' | 'document'
+  final String label;
+  final String size;
+
+  const CaseMedia({
+    required this.type,
+    required this.label,
+    required this.size,
+  });
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 }
 
 class CaseModel {
@@ -69,6 +85,7 @@ class CaseDatabase {
       victimName: 'Abena Mensah',
       victimAge: 24,
       location: 'Accra, Greater Accra',
+<<<<<<< HEAD
       description: 'Victim reported an assault at her residence. Case investigated and perpetrator apprehended.',
       officer: 'Sgt. Kofi Adu',
       updates: [
@@ -80,6 +97,40 @@ class CaseDatabase {
       media: [
         CaseMedia(type: 'image', label: 'Scene Photo 1.jpg', size: '2.1 MB'),
         CaseMedia(type: 'document', label: 'Medical Report.pdf', size: '540 KB'),
+=======
+      description:
+          'Victim reported an assault at her residence. Case investigated and perpetrator apprehended.',
+      officer: 'Sgt. Kofi Adu',
+      updates: [
+        CaseUpdate(
+          date: '02/02/2026',
+          message: 'Case opened. Initial report received.',
+          author: 'System',
+        ),
+        CaseUpdate(
+          date: '05/02/2026',
+          message: 'Officer assigned. Victim interviewed.',
+          author: 'Sgt. Kofi Adu',
+        ),
+        CaseUpdate(
+          date: '12/02/2026',
+          message: 'Suspect apprehended. Evidence collected.',
+          author: 'Sgt. Kofi Adu',
+        ),
+        CaseUpdate(
+          date: '20/02/2026',
+          message: 'Case resolved. Perpetrator charged.',
+          author: 'Sgt. Kofi Adu',
+        ),
+      ],
+      media: [
+        CaseMedia(type: 'image', label: 'Scene Photo 1.jpg', size: '2.1 MB'),
+        CaseMedia(
+          type: 'document',
+          label: 'Medical Report.pdf',
+          size: '540 KB',
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
         CaseMedia(type: 'voice', label: 'Victim Statement.mp3', size: '3.4 MB'),
       ],
     ),
@@ -91,11 +142,28 @@ class CaseDatabase {
       victimName: 'Akosua Darko',
       victimAge: 19,
       location: 'Kumasi, Ashanti',
+<<<<<<< HEAD
       description: 'Victim reported an incident near her school. Investigation ongoing.',
       officer: 'Sgt. Ama Boateng',
       updates: [
         CaseUpdate(date: '02/02/2026', message: 'Case opened. Awaiting officer assignment.', author: 'System'),
         CaseUpdate(date: '04/02/2026', message: 'Officer assigned. Scene visited.', author: 'Sgt. Ama Boateng'),
+=======
+      description:
+          'Victim reported an incident near her school. Investigation ongoing.',
+      officer: 'Sgt. Ama Boateng',
+      updates: [
+        CaseUpdate(
+          date: '02/02/2026',
+          message: 'Case opened. Awaiting officer assignment.',
+          author: 'System',
+        ),
+        CaseUpdate(
+          date: '04/02/2026',
+          message: 'Officer assigned. Scene visited.',
+          author: 'Sgt. Ama Boateng',
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       ],
       media: [
         CaseMedia(type: 'voice', label: 'Voice Note.mp3', size: '1.8 MB'),
@@ -109,6 +177,7 @@ class CaseDatabase {
       victimName: 'Efua Asante',
       victimAge: 31,
       location: 'Takoradi, Western',
+<<<<<<< HEAD
       description: 'Victim sustained injuries from a domestic dispute. Medical report filed.',
       officer: 'Cpl. Yaw Owusu',
       updates: [
@@ -117,6 +186,25 @@ class CaseDatabase {
       media: [
         CaseMedia(type: 'image', label: 'Injury Photo.jpg', size: '1.2 MB'),
         CaseMedia(type: 'document', label: 'Medical Report.pdf', size: '320 KB'),
+=======
+      description:
+          'Victim sustained injuries from a domestic dispute. Medical report filed.',
+      officer: 'Cpl. Yaw Owusu',
+      updates: [
+        CaseUpdate(
+          date: '05/02/2026',
+          message: 'Case opened. Medical report attached.',
+          author: 'System',
+        ),
+      ],
+      media: [
+        CaseMedia(type: 'image', label: 'Injury Photo.jpg', size: '1.2 MB'),
+        CaseMedia(
+          type: 'document',
+          label: 'Medical Report.pdf',
+          size: '320 KB',
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       ],
     ),
     CaseModel(
@@ -127,12 +215,34 @@ class CaseDatabase {
       victimName: 'Adwoa Frimpong',
       victimAge: 27,
       location: 'Tamale, Northern',
+<<<<<<< HEAD
       description: 'Workplace harassment complaint. Employer reprimanded and victim transferred to a safe unit.',
       officer: 'Insp. Kojo Mensah',
       updates: [
         CaseUpdate(date: '08/02/2026', message: 'Case opened.', author: 'System'),
         CaseUpdate(date: '10/02/2026', message: 'Workplace visited. Witnesses interviewed.', author: 'Insp. Kojo Mensah'),
         CaseUpdate(date: '15/02/2026', message: 'Case resolved. Employer issued formal warning.', author: 'Insp. Kojo Mensah'),
+=======
+      description:
+          'Workplace harassment complaint. Employer reprimanded and victim transferred to a safe unit.',
+      officer: 'Insp. Kojo Mensah',
+      updates: [
+        CaseUpdate(
+          date: '08/02/2026',
+          message: 'Case opened.',
+          author: 'System',
+        ),
+        CaseUpdate(
+          date: '10/02/2026',
+          message: 'Workplace visited. Witnesses interviewed.',
+          author: 'Insp. Kojo Mensah',
+        ),
+        CaseUpdate(
+          date: '15/02/2026',
+          message: 'Case resolved. Employer issued formal warning.',
+          author: 'Insp. Kojo Mensah',
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       ],
       media: [],
     ),
@@ -144,10 +254,22 @@ class CaseDatabase {
       victimName: 'Serwa Quaye',
       victimAge: 22,
       location: 'Cape Coast, Central',
+<<<<<<< HEAD
       description: 'Victim has been followed repeatedly. CCTV evidence collected.',
       officer: 'Sgt. Kofi Adu',
       updates: [
         CaseUpdate(date: '10/02/2026', message: 'Case opened. CCTV footage requested.', author: 'System'),
+=======
+      description:
+          'Victim has been followed repeatedly. CCTV evidence collected.',
+      officer: 'Sgt. Kofi Adu',
+      updates: [
+        CaseUpdate(
+          date: '10/02/2026',
+          message: 'Case opened. CCTV footage requested.',
+          author: 'System',
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       ],
       media: [
         CaseMedia(type: 'image', label: 'CCTV Screenshot.jpg', size: '890 KB'),
@@ -160,6 +282,7 @@ class CaseDatabase {
 
   List<CaseModel> search(String query) {
     final q = query.toLowerCase();
+<<<<<<< HEAD
     return _cases.where((c) =>
     c.incidentNumber.toLowerCase().contains(q) ||
         c.caseType.toLowerCase().contains(q) ||
@@ -169,6 +292,20 @@ class CaseDatabase {
         c.officer.toLowerCase().contains(q) ||
         c.victimAge.toString().contains(q),
     ).toList();
+=======
+    return _cases
+        .where(
+          (c) =>
+              c.incidentNumber.toLowerCase().contains(q) ||
+              c.caseType.toLowerCase().contains(q) ||
+              c.status.toLowerCase().contains(q) ||
+              c.victimName.toLowerCase().contains(q) ||
+              c.location.toLowerCase().contains(q) ||
+              c.officer.toLowerCase().contains(q) ||
+              c.victimAge.toString().contains(q),
+        )
+        .toList();
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
   }
 }
 
@@ -202,7 +339,14 @@ class _CaseHistoryState extends State<CaseHistory> {
   }
 
   Future<void> _goToNewCase() async {
+<<<<<<< HEAD
     await Navigator.push(context, MaterialPageRoute(builder: (_) => const NewCasePage()));
+=======
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NewCasePage()),
+    );
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     setState(() {
       _displayedCases = _searchController.text.trim().isEmpty
           ? CaseDatabase.instance.allCases
@@ -211,7 +355,14 @@ class _CaseHistoryState extends State<CaseHistory> {
   }
 
   Future<void> _goToDetail(CaseModel c) async {
+<<<<<<< HEAD
     await Navigator.push(context, MaterialPageRoute(builder: (_) => CaseDetailPage(caseModel: c)));
+=======
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CaseDetailPage(caseModel: c)),
+    );
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     setState(() {
       _displayedCases = _searchController.text.trim().isEmpty
           ? CaseDatabase.instance.allCases
@@ -221,10 +372,21 @@ class _CaseHistoryState extends State<CaseHistory> {
 
   Color _statusColor(String status) {
     switch (status.toLowerCase()) {
+<<<<<<< HEAD
       case 'resolved': return const Color(0xFF2ECC71);
       case 'pending':  return const Color(0xFFE67E22);
       case 'closed':   return const Color(0xFF95A5A6);
       default:         return const Color(0xFFABABAB);
+=======
+      case 'resolved':
+        return const Color(0xFF2ECC71);
+      case 'pending':
+        return const Color(0xFFE67E22);
+      case 'closed':
+        return const Color(0xFF95A5A6);
+      default:
+        return const Color(0xFFABABAB);
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     }
   }
 
@@ -232,12 +394,25 @@ class _CaseHistoryState extends State<CaseHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bronze,
+<<<<<<< HEAD
       body: SafeArea(
         child: Stack(
           children: [
             Column(
               children: [
                 Container(width: double.infinity, height: 44, color: Colors.white),
+=======
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 1),
+      body: SafeArea(
+        child: Column(
+          children: [
+
+                Container(
+                  width: double.infinity,
+                  height: 44,
+                  color: Colors.white,
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
@@ -245,12 +420,26 @@ class _CaseHistoryState extends State<CaseHistory> {
                     height: 52,
                     decoration: ShapeDecoration(
                       color: Colors.white,
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                       shadows: const [BoxShadow(color: Color(0x3FD8D0D0), blurRadius: 4, offset: Offset(0, 4))],
+=======
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      shadows: const [
+                        BoxShadow(
+                          color: Color(0x3FD8D0D0),
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ),
                     child: TextField(
                       controller: _searchController,
                       onChanged: _onSearchChanged,
+<<<<<<< HEAD
                       style: const TextStyle(fontSize: 14, color: Color(0xFF181D27)),
                       decoration: InputDecoration(
                         hintText: 'Search name, type, status, age…',
@@ -264,6 +453,39 @@ class _CaseHistoryState extends State<CaseHistory> {
                             : null,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(vertical: 16),
+=======
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF181D27),
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Search name, type, status, age…',
+                        hintStyle: const TextStyle(
+                          color: Color(0xFFCFC7C7),
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFFCFC7C7),
+                        ),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.clear,
+                                  color: Color(0xFFCFC7C7),
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _onSearchChanged('');
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                       ),
                     ),
                   ),
@@ -274,12 +496,33 @@ class _CaseHistoryState extends State<CaseHistory> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+<<<<<<< HEAD
                       Text('${_displayedCases.length} case(s) found',
                           style: const TextStyle(color: Colors.white70, fontSize: 12)),
                       TextButton.icon(
                         onPressed: _goToNewCase,
                         icon: const Icon(Icons.add_circle_outline, color: Colors.white, size: 18),
                         label: const Text('New Case', style: TextStyle(color: Colors.white, fontSize: 13)),
+=======
+                      Text(
+                        '${_displayedCases.length} case(s) found',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: _goToNewCase,
+                        icon: const Icon(
+                          Icons.add_circle_outline,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        label: const Text(
+                          'New Case',
+                          style: TextStyle(color: Colors.white, fontSize: 13),
+                        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                       ),
                     ],
                   ),
@@ -288,6 +531,7 @@ class _CaseHistoryState extends State<CaseHistory> {
                 Expanded(
                   child: _displayedCases.isEmpty
                       ? const Center(
+<<<<<<< HEAD
                       child: Text('No cases match your search.',
                           style: TextStyle(color: Colors.white70, fontSize: 14)))
                       : ListView.separated(
@@ -328,11 +572,44 @@ class _CaseHistoryState extends State<CaseHistory> {
             ),
           ],
         ),
+=======
+                          child: Text(
+                            'No cases match your search.',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(24, 4, 24, 104),
+                          itemCount: _displayedCases.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 14),
+                          itemBuilder: (context, i) {
+                            final c = _displayedCases[i];
+                            return GestureDetector(
+                              onTap: () => _goToDetail(c),
+                              child: _CaseCard(
+                                c: c,
+                                statusColor: _statusColor(c.status),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       ),
     );
   }
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 // ─────────────────────────────────────────────────────────────────────────────
 // CASE DETAIL PAGE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -345,28 +622,61 @@ class CaseDetailPage extends StatelessWidget {
 
   Color _statusColor(String s) {
     switch (s.toLowerCase()) {
+<<<<<<< HEAD
       case 'resolved': return const Color(0xFF2ECC71);
       case 'pending':  return const Color(0xFFE67E22);
       case 'closed':   return const Color(0xFF95A5A6);
       default:         return const Color(0xFFABABAB);
+=======
+      case 'resolved':
+        return const Color(0xFF2ECC71);
+      case 'pending':
+        return const Color(0xFFE67E22);
+      case 'closed':
+        return const Color(0xFF95A5A6);
+      default:
+        return const Color(0xFFABABAB);
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     }
   }
 
   IconData _mediaIcon(String type) {
     switch (type) {
+<<<<<<< HEAD
       case 'image':    return Icons.image_outlined;
       case 'voice':    return Icons.mic_outlined;
       case 'document': return Icons.description_outlined;
       default:         return Icons.attach_file;
+=======
+      case 'image':
+        return Icons.image_outlined;
+      case 'voice':
+        return Icons.mic_outlined;
+      case 'document':
+        return Icons.description_outlined;
+      default:
+        return Icons.attach_file;
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     }
   }
 
   Color _mediaColor(String type) {
     switch (type) {
+<<<<<<< HEAD
       case 'image':    return const Color(0xFF3498DB);
       case 'voice':    return const Color(0xFFE67E22);
       case 'document': return const Color(0xFF9B59B6);
       default:         return const Color(0xFFABABAB);
+=======
+      case 'image':
+        return const Color(0xFF3498DB);
+      case 'voice':
+        return const Color(0xFFE67E22);
+      case 'document':
+        return const Color(0xFF9B59B6);
+      default:
+        return const Color(0xFFABABAB);
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     }
   }
 
@@ -390,6 +700,7 @@ class CaseDetailPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
+<<<<<<< HEAD
                         child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
                       ),
                       const SizedBox(width: 12),
@@ -406,10 +717,50 @@ class CaseDetailPage extends StatelessWidget {
                         ),
                         child: Text(caseModel.status,
                             style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w700)),
+=======
+                        child: const Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          caseModel.incidentNumber,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: statusColor.withOpacity(0.5),
+                          ),
+                        ),
+                        child: Text(
+                          caseModel.status,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
+<<<<<<< HEAD
                   Text(caseModel.caseType,
                       style: const TextStyle(color: Colors.white70, fontSize: 13)),
                   const SizedBox(height: 4),
@@ -425,6 +776,44 @@ class CaseDetailPage extends StatelessWidget {
                         child: Text(caseModel.location,
                             style: const TextStyle(color: Colors.white54, fontSize: 12),
                             overflow: TextOverflow.ellipsis),
+=======
+                  Text(
+                    caseModel.caseType,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today,
+                        color: Colors.white54,
+                        size: 13,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        caseModel.date,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      const Icon(
+                        Icons.location_on_outlined,
+                        color: Colors.white54,
+                        size: 13,
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          caseModel.location,
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                       ),
                     ],
                   ),
@@ -439,17 +828,27 @@ class CaseDetailPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     // Victim info card
                     _sectionCard(
                       title: 'Victim Information',
                       icon: Icons.person_outline,
                       child: Column(
                         children: [
+<<<<<<< HEAD
                           _infoRow('Name',    caseModel.victimName),
                           _infoRow('Age',     '${caseModel.victimAge} years'),
                           _infoRow('Location', caseModel.location),
                           _infoRow('Officer',  caseModel.officer),
+=======
+                          _infoRow('Name', caseModel.victimName),
+                          _infoRow('Age', '${caseModel.victimAge} years'),
+                          _infoRow('Location', caseModel.location),
+                          _infoRow('Officer', caseModel.officer),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                         ],
                       ),
                     ),
@@ -459,8 +858,19 @@ class CaseDetailPage extends StatelessWidget {
                     _sectionCard(
                       title: 'Incident Description',
                       icon: Icons.notes_outlined,
+<<<<<<< HEAD
                       child: Text(caseModel.description,
                           style: const TextStyle(color: Color(0xFF4A4A4A), fontSize: 13, height: 1.6)),
+=======
+                      child: Text(
+                        caseModel.description,
+                        style: const TextStyle(
+                          color: Color(0xFF4A4A4A),
+                          fontSize: 13,
+                          height: 1.6,
+                        ),
+                      ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ),
                     const SizedBox(height: 16),
 
@@ -468,6 +878,7 @@ class CaseDetailPage extends StatelessWidget {
                     _sectionCard(
                       title: 'Uploaded Evidence',
                       icon: Icons.attach_file_outlined,
+<<<<<<< HEAD
                       trailing: Text('${caseModel.media.length} file(s)',
                           style: const TextStyle(color: Color(0xFFABABAB), fontSize: 12)),
                       child: caseModel.media.isEmpty
@@ -479,6 +890,31 @@ class CaseDetailPage extends StatelessWidget {
                           : Column(
                         children: caseModel.media.map((m) => _mediaRow(m)).toList(),
                       ),
+=======
+                      trailing: Text(
+                        '${caseModel.media.length} file(s)',
+                        style: const TextStyle(
+                          color: Color(0xFFABABAB),
+                          fontSize: 12,
+                        ),
+                      ),
+                      child: caseModel.media.isEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Text(
+                                'No files uploaded.',
+                                style: TextStyle(
+                                  color: Color(0xFFABABAB),
+                                  fontSize: 13,
+                                ),
+                              ),
+                            )
+                          : Column(
+                              children: caseModel.media
+                                  .map((m) => _mediaRow(m))
+                                  .toList(),
+                            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ),
                     const SizedBox(height: 16),
 
@@ -517,7 +953,17 @@ class CaseDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+<<<<<<< HEAD
         boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 8, offset: Offset(0, 2))],
+=======
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
         border: Border.all(color: const Color(0xFFF0F0F0)),
       ),
       child: Column(
@@ -526,7 +972,12 @@ class CaseDetailPage extends StatelessWidget {
           Row(
             children: [
               Container(
+<<<<<<< HEAD
                 width: 32, height: 32,
+=======
+                width: 32,
+                height: 32,
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                 decoration: BoxDecoration(
                   color: _bronze.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -535,8 +986,19 @@ class CaseDetailPage extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
+<<<<<<< HEAD
                 child: Text(title,
                     style: const TextStyle(color: Color(0xFF181D27), fontSize: 14, fontWeight: FontWeight.w700)),
+=======
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFF181D27),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
               ),
               if (trailing != null) trailing,
             ],
@@ -558,12 +1020,33 @@ class CaseDetailPage extends StatelessWidget {
         children: [
           SizedBox(
             width: 80,
+<<<<<<< HEAD
             child: Text(label,
                 style: const TextStyle(color: Color(0xFFABABAB), fontSize: 12, fontWeight: FontWeight.w500)),
           ),
           Expanded(
             child: Text(value,
                 style: const TextStyle(color: Color(0xFF181D27), fontSize: 13, fontWeight: FontWeight.w500)),
+=======
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFFABABAB),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Color(0xFF181D27),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ),
         ],
       ),
@@ -577,7 +1060,12 @@ class CaseDetailPage extends StatelessWidget {
       child: Row(
         children: [
           Container(
+<<<<<<< HEAD
             width: 38, height: 38,
+=======
+            width: 38,
+            height: 38,
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
@@ -589,9 +1077,27 @@ class CaseDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+<<<<<<< HEAD
                 Text(m.label,
                     style: const TextStyle(color: Color(0xFF181D27), fontSize: 13, fontWeight: FontWeight.w500)),
                 Text(m.size, style: const TextStyle(color: Color(0xFFABABAB), fontSize: 11)),
+=======
+                Text(
+                  m.label,
+                  style: const TextStyle(
+                    color: Color(0xFF181D27),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  m.size,
+                  style: const TextStyle(
+                    color: Color(0xFFABABAB),
+                    fontSize: 11,
+                  ),
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
               ],
             ),
           ),
@@ -608,7 +1114,12 @@ class CaseDetailPage extends StatelessWidget {
         Column(
           children: [
             Container(
+<<<<<<< HEAD
               width: 12, height: 12,
+=======
+              width: 12,
+              height: 12,
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
               decoration: BoxDecoration(
                 color: _bronze,
                 shape: BoxShape.circle,
@@ -626,6 +1137,7 @@ class CaseDetailPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+<<<<<<< HEAD
                 Text(u.message,
                     style: const TextStyle(color: Color(0xFF181D27), fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 4),
@@ -634,6 +1146,34 @@ class CaseDetailPage extends StatelessWidget {
                     Text(u.date, style: const TextStyle(color: Color(0xFFABABAB), fontSize: 11)),
                     const SizedBox(width: 8),
                     Text('• ${u.author}', style: const TextStyle(color: Color(0xFFABABAB), fontSize: 11)),
+=======
+                Text(
+                  u.message,
+                  style: const TextStyle(
+                    color: Color(0xFF181D27),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      u.date,
+                      style: const TextStyle(
+                        color: Color(0xFFABABAB),
+                        fontSize: 11,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '• ${u.author}',
+                      style: const TextStyle(
+                        color: Color(0xFFABABAB),
+                        fontSize: 11,
+                      ),
+                    ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                   ],
                 ),
               ],
@@ -659,15 +1199,30 @@ class _NewCasePageState extends State<NewCasePage> {
   static const Color _bronze = Color(0xFFCD7F32);
   final _formKey = GlobalKey<FormState>();
 
+<<<<<<< HEAD
   final _victimNameCtrl  = TextEditingController();
   final _victimAgeCtrl   = TextEditingController();
   final _locationCtrl    = TextEditingController();
+=======
+  final _victimNameCtrl = TextEditingController();
+  final _victimAgeCtrl = TextEditingController();
+  final _locationCtrl = TextEditingController();
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
   final _descriptionCtrl = TextEditingController();
 
   String _caseType = 'Rape Case';
   final List<String> _caseTypes = [
+<<<<<<< HEAD
     'Rape Case', 'Domestic Violence', 'Sexual Harassment',
     'Stalking', 'Child Abuse', 'Other',
+=======
+    'Rape Case',
+    'Domestic Violence',
+    'Sexual Harassment',
+    'Stalking',
+    'Child Abuse',
+    'Other',
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
   ];
 
   // Dummy uploaded files list (label + type)
@@ -676,6 +1231,7 @@ class _NewCasePageState extends State<NewCasePage> {
   void _pickMedia(String type) {
     // In production replace with file_picker / image_picker
     final labels = {
+<<<<<<< HEAD
       'image':    'Photo_${_uploadedMedia.length + 1}.jpg',
       'voice':    'VoiceNote_${_uploadedMedia.length + 1}.mp3',
       'document': 'Document_${_uploadedMedia.length + 1}.pdf',
@@ -690,10 +1246,26 @@ class _NewCasePageState extends State<NewCasePage> {
   }
 
   void _removeMedia(int index) => setState(() => _uploadedMedia.removeAt(index));
+=======
+      'image': 'Photo_${_uploadedMedia.length + 1}.jpg',
+      'voice': 'VoiceNote_${_uploadedMedia.length + 1}.mp3',
+      'document': 'Document_${_uploadedMedia.length + 1}.pdf',
+    };
+    setState(() {
+      _uploadedMedia.add(
+        CaseMedia(type: type, label: labels[type]!, size: '—'),
+      );
+    });
+  }
+
+  void _removeMedia(int index) =>
+      setState(() => _uploadedMedia.removeAt(index));
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final count = CaseDatabase.instance.allCases.length + 1;
+<<<<<<< HEAD
     final now   = DateTime.now();
     final date  = '${now.day.toString().padLeft(2,'0')}/${now.month.toString().padLeft(2,'0')}/${now.year}';
 
@@ -715,6 +1287,39 @@ class _NewCasePageState extends State<NewCasePage> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Case submitted successfully!'), backgroundColor: Color(0xFF2ECC71)),
+=======
+    final now = DateTime.now();
+    final date =
+        '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}';
+
+    CaseDatabase.instance.addCase(
+      CaseModel(
+        incidentNumber: 'Incident No.$count',
+        date: date,
+        caseType: _caseType,
+        status: 'Pending',
+        victimName: _victimNameCtrl.text.trim(),
+        victimAge: int.tryParse(_victimAgeCtrl.text.trim()) ?? 0,
+        location: _locationCtrl.text.trim(),
+        description: _descriptionCtrl.text.trim(),
+        officer: 'Unassigned',
+        updates: [
+          CaseUpdate(
+            date: date,
+            message: 'Case submitted by user.',
+            author: 'System',
+          ),
+        ],
+        media: List.from(_uploadedMedia),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Case submitted successfully!'),
+        backgroundColor: Color(0xFF2ECC71),
+      ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     );
     Navigator.pop(context);
   }
@@ -730,8 +1335,19 @@ class _NewCasePageState extends State<NewCasePage> {
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
+<<<<<<< HEAD
         title: const Text('Report a Case',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+=======
+        title: const Text(
+          'Report a Case',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
         centerTitle: true,
       ),
       body: SafeArea(
@@ -742,6 +1358,7 @@ class _NewCasePageState extends State<NewCasePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+<<<<<<< HEAD
 
                 // ── Victim info ───────────────────────────────────
                 _sectionLabel('Your Information'),
@@ -757,18 +1374,63 @@ class _NewCasePageState extends State<NewCasePage> {
                     }),
                 _field('Location', _locationCtrl, hint: 'City, Region',
                     validator: (v) => v!.trim().isEmpty ? 'Required' : null),
+=======
+                // ── Victim info ───────────────────────────────────
+                _sectionLabel('Your Information'),
+                const SizedBox(height: 10),
+                _field(
+                  'Full Name',
+                  _victimNameCtrl,
+                  hint: 'Your full name',
+                  validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                ),
+                _field(
+                  'Age',
+                  _victimAgeCtrl,
+                  hint: 'Your age',
+                  keyboard: TextInputType.number,
+                  validator: (v) {
+                    if (v!.trim().isEmpty) return 'Required';
+                    if (int.tryParse(v.trim()) == null) return 'Numbers only';
+                    return null;
+                  },
+                ),
+                _field(
+                  'Location',
+                  _locationCtrl,
+                  hint: 'City, Region',
+                  validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
                 const SizedBox(height: 16),
 
                 // ── Incident info ─────────────────────────────────
                 _sectionLabel('Incident Details'),
                 const SizedBox(height: 10),
+<<<<<<< HEAD
                 _dropdown('Incident Type', _caseTypes, _caseType,
                         (v) => setState(() => _caseType = v!)),
                 _field('Description', _descriptionCtrl,
                     hint: 'Describe what happened in as much detail as you feel comfortable sharing…',
                     maxLines: 5,
                     validator: (v) => v!.trim().isEmpty ? 'Required' : null),
+=======
+                _dropdown(
+                  'Incident Type',
+                  _caseTypes,
+                  _caseType,
+                  (v) => setState(() => _caseType = v!),
+                ),
+                _field(
+                  'Description',
+                  _descriptionCtrl,
+                  hint:
+                      'Describe what happened in as much detail as you feel comfortable sharing…',
+                  maxLines: 5,
+                  validator: (v) => v!.trim().isEmpty ? 'Required' : null,
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
                 const SizedBox(height: 16),
 
@@ -784,11 +1446,31 @@ class _NewCasePageState extends State<NewCasePage> {
                 // Upload buttons row
                 Row(
                   children: [
+<<<<<<< HEAD
                     _uploadBtn(Icons.image_outlined,       'Photo',    () => _pickMedia('image')),
                     const SizedBox(width: 10),
                     _uploadBtn(Icons.mic_outlined,         'Voice',    () => _pickMedia('voice')),
                     const SizedBox(width: 10),
                     _uploadBtn(Icons.description_outlined, 'Document', () => _pickMedia('document')),
+=======
+                    _uploadBtn(
+                      Icons.image_outlined,
+                      'Photo',
+                      () => _pickMedia('image'),
+                    ),
+                    const SizedBox(width: 10),
+                    _uploadBtn(
+                      Icons.mic_outlined,
+                      'Voice',
+                      () => _pickMedia('voice'),
+                    ),
+                    const SizedBox(width: 10),
+                    _uploadBtn(
+                      Icons.description_outlined,
+                      'Document',
+                      () => _pickMedia('document'),
+                    ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                   ],
                 ),
 
@@ -805,11 +1487,32 @@ class _NewCasePageState extends State<NewCasePage> {
                         final m = _uploadedMedia[i];
                         return ListTile(
                           dense: true,
+<<<<<<< HEAD
                           leading: Icon(_mediaIcon(m.type), color: Colors.white70, size: 20),
                           title: Text(m.label,
                               style: const TextStyle(color: Colors.white, fontSize: 13)),
                           trailing: IconButton(
                             icon: const Icon(Icons.close, color: Colors.white54, size: 18),
+=======
+                          leading: Icon(
+                            _mediaIcon(m.type),
+                            color: Colors.white70,
+                            size: 20,
+                          ),
+                          title: Text(
+                            m.label,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white54,
+                              size: 18,
+                            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                             onPressed: () => _removeMedia(i),
                           ),
                         );
@@ -827,11 +1530,26 @@ class _NewCasePageState extends State<NewCasePage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: _bronze,
+<<<<<<< HEAD
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       elevation: 4,
                     ),
                     child: const Text('Submit Report',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+=======
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 4,
+                    ),
+                    child: const Text(
+                      'Submit Report',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -845,10 +1563,21 @@ class _NewCasePageState extends State<NewCasePage> {
 
   IconData _mediaIcon(String type) {
     switch (type) {
+<<<<<<< HEAD
       case 'image':    return Icons.image_outlined;
       case 'voice':    return Icons.mic_outlined;
       case 'document': return Icons.description_outlined;
       default:         return Icons.attach_file;
+=======
+      case 'image':
+        return Icons.image_outlined;
+      case 'voice':
+        return Icons.mic_outlined;
+      case 'document':
+        return Icons.description_outlined;
+      default:
+        return Icons.attach_file;
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     }
   }
 
@@ -868,7 +1597,14 @@ class _NewCasePageState extends State<NewCasePage> {
             children: [
               Icon(icon, color: Colors.white, size: 22),
               const SizedBox(height: 4),
+<<<<<<< HEAD
               Text(label, style: const TextStyle(color: Colors.white, fontSize: 11)),
+=======
+              Text(
+                label,
+                style: const TextStyle(color: Colors.white, fontSize: 11),
+              ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             ],
           ),
         ),
@@ -876,10 +1612,25 @@ class _NewCasePageState extends State<NewCasePage> {
     );
   }
 
+<<<<<<< HEAD
   Widget _sectionLabel(String text) => Text(text,
       style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold));
 
   Widget _field(String label, TextEditingController ctrl, {
+=======
+  Widget _sectionLabel(String text) => Text(
+    text,
+    style: const TextStyle(
+      color: Colors.white,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+    ),
+  );
+
+  Widget _field(
+    String label,
+    TextEditingController ctrl, {
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
     String? hint,
     int maxLines = 1,
     TextInputType keyboard = TextInputType.text,
@@ -888,7 +1639,18 @@ class _NewCasePageState extends State<NewCasePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+<<<<<<< HEAD
         Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500)),
+=======
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
@@ -901,12 +1663,26 @@ class _NewCasePageState extends State<NewCasePage> {
             hintStyle: const TextStyle(color: Color(0xFFCFC7C7), fontSize: 13),
             fillColor: Colors.white,
             filled: true,
+<<<<<<< HEAD
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+=======
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
+<<<<<<< HEAD
             errorStyle: const TextStyle(color: Colors.yellowAccent, fontSize: 11),
+=======
+            errorStyle: const TextStyle(
+              color: Colors.yellowAccent,
+              fontSize: 11,
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ),
         ),
         const SizedBox(height: 14),
@@ -914,6 +1690,7 @@ class _NewCasePageState extends State<NewCasePage> {
     );
   }
 
+<<<<<<< HEAD
   Widget _dropdown(String label, List<String> items, String value, void Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -923,13 +1700,45 @@ class _NewCasePageState extends State<NewCasePage> {
         DropdownButtonFormField<String>(
           value: value,
           items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+=======
+  Widget _dropdown(
+    String label,
+    List<String> items,
+    String value,
+    void Function(String?) onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<String>(
+          value: value,
+          items: items
+              .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+              .toList(),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           onChanged: onChanged,
           style: const TextStyle(fontSize: 14, color: Color(0xFF181D27)),
           dropdownColor: Colors.white,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
+<<<<<<< HEAD
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+=======
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -958,14 +1767,38 @@ class _CaseCard extends StatelessWidget {
       decoration: ShapeDecoration(
         color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+<<<<<<< HEAD
         shadows: const [BoxShadow(color: Color(0x1A000000), blurRadius: 6, offset: Offset(0, 3))],
+=======
+        shadows: const [
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
+        ],
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       ),
       child: Row(
         children: [
           Container(
+<<<<<<< HEAD
             width: 44, height: 44,
             decoration: const ShapeDecoration(color: Color(0x0D0600B3), shape: OvalBorder()),
             child: const Icon(Icons.folder_outlined, color: Color(0xFF0600B3), size: 22),
+=======
+            width: 44,
+            height: 44,
+            decoration: const ShapeDecoration(
+              color: Color(0x0D0600B3),
+              shape: OvalBorder(),
+            ),
+            child: const Icon(
+              Icons.folder_outlined,
+              color: Color(0xFF0600B3),
+              size: 22,
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -975,20 +1808,48 @@ class _CaseCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+<<<<<<< HEAD
                     Text(c.incidentNumber,
                         style: const TextStyle(color: Color(0xFF181D27), fontSize: 13, fontWeight: FontWeight.w600)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+=======
+                    Text(
+                      c.incidentNumber,
+                      style: const TextStyle(
+                        color: Color(0xFF181D27),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                       decoration: BoxDecoration(
                         color: statusColor.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
+<<<<<<< HEAD
                       child: Text(c.status,
                           style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w600)),
+=======
+                      child: Text(
+                        c.status,
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ),
                   ],
                 ),
                 const SizedBox(height: 3),
+<<<<<<< HEAD
                 Text(c.date, style: const TextStyle(color: Color(0xFFABABAB), fontSize: 11)),
                 const SizedBox(height: 5),
                 Text(c.caseType,
@@ -997,6 +1858,33 @@ class _CaseCard extends StatelessWidget {
                 Text('${c.victimName} · Age ${c.victimAge} · ${c.location}',
                     style: const TextStyle(color: Color(0xFFABABAB), fontSize: 11),
                     overflow: TextOverflow.ellipsis),
+=======
+                Text(
+                  c.date,
+                  style: const TextStyle(
+                    color: Color(0xFFABABAB),
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  c.caseType,
+                  style: const TextStyle(
+                    color: Color(0xFF181D27),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${c.victimName} · Age ${c.victimAge} · ${c.location}',
+                  style: const TextStyle(
+                    color: Color(0xFFABABAB),
+                    fontSize: 11,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
               ],
             ),
           ),
@@ -1008,6 +1896,7 @@ class _CaseCard extends StatelessWidget {
   }
 }
 
+<<<<<<< HEAD
 // ─────────────────────────────────────────────────────────────────────────────
 // NAV BAR ITEM
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1041,3 +1930,6 @@ class _NavBarItem extends StatelessWidget {
     }
   }
 }
+=======
+
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef

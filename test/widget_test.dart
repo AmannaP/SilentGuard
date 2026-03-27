@@ -1,6 +1,10 @@
 // This is a basic Flutter widget test.
 //
+<<<<<<< HEAD
 // To perform an interaction with a widget in your test, use the WidgetTester
+=======
+// To perform an interaction with a widget in the test, use the WidgetTester
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 // utility in the flutter_test package. For example, you can send tap and scroll
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
@@ -13,7 +17,11 @@ import 'package:silent_guard/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
+<<<<<<< HEAD
     await tester.pumpWidget(const MyApp());
+=======
+    await tester.pumpWidget(const SilentGuardApp());
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

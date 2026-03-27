@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import '../widgets/custom_bottom_nav_bar.dart';
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -36,7 +40,15 @@ class HomeScreen extends StatelessWidget {
                         ),
                         Row(
                           children: const [
+<<<<<<< HEAD
                             Icon(Icons.location_on, size: 14, color: Colors.black),
+=======
+                            Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: Colors.black,
+                            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                             SizedBox(width: 4),
                             Text(
                               "Accra, Ghana",
@@ -114,7 +126,22 @@ class HomeScreen extends StatelessWidget {
                     // --- SOS Button ---
                     Center(
                       child: GestureDetector(
+<<<<<<< HEAD
                         onTap: () => Navigator.pushNamed(context, '/map_tracking'),
+=======
+                        onLongPress: () => Navigator.pushNamed(
+                          context,
+                          '/map_tracking_screen',
+                        ),
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Press and hold for 3 seconds to activate SOS'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        },
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                         child: Container(
                           width: 220,
                           height: 220,
@@ -136,7 +163,11 @@ class HomeScreen extends StatelessWidget {
                                   color: Colors.black26,
                                   blurRadius: 15,
                                   offset: Offset(0, 8),
+<<<<<<< HEAD
                                 )
+=======
+                                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                               ],
                             ),
                             child: Column(
@@ -151,7 +182,11 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
+<<<<<<< HEAD
                                   "Press 3 for\nsecond",
+=======
+                                  "Hold for 3\nseconds",
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.white70,
@@ -177,9 +212,30 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15),
+<<<<<<< HEAD
                     _buildActionItem(Icons.medical_services, "Upload Evidence", Colors.green.shade100),
                     _buildActionItem(Icons.phone_in_talk, "Place a call", Colors.blue.shade100),
                     _buildActionItem(Icons.mic, "Record Evidence", Colors.purple.shade100),
+=======
+                    _buildActionItem(
+                      Icons.medical_services,
+                      "Upload Evidence",
+                      Colors.green.shade100,
+                      onTap: () => Navigator.pushNamed(context, '/upload_evidence_screen'),
+                    ),
+                    _buildActionItem(
+                      Icons.phone_in_talk,
+                      "Place a call",
+                      Colors.blue.shade100,
+                      onTap: () => Navigator.pushNamed(context, '/call_screen'),
+                    ),
+                    _buildActionItem(
+                      Icons.mic,
+                      "Record Evidence",
+                      Colors.purple.shade100,
+                      onTap: () => Navigator.pushNamed(context, '/record_evidence_screen'),
+                    ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     const SizedBox(height: 100), // Space for Bottom Nav
                   ],
                 ),
@@ -189,6 +245,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       // Custom Bottom Navigation
+<<<<<<< HEAD
       bottomSheet: Container(
         height: 90,
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -206,11 +263,45 @@ class HomeScreen extends StatelessWidget {
             _buildNavItem(Icons.history, "History", false, onTap: () => Navigator.pushNamed(context, '/case_history')),
             _buildNavItem(Icons.explore_outlined, "Archive", false),
             _buildNavItem(Icons.person_outline, "Profile", false),
+=======
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 0),
+    );
+  }
+
+  Widget _buildActionItem(IconData icon, String label, Color iconBg, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 20),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ],
         ),
       ),
     );
   }
+<<<<<<< HEAD
 
   Widget _buildActionItem(IconData icon, String label, Color iconBg) {
     return Container(
@@ -261,4 +352,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+=======
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 }

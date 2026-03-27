@@ -21,6 +21,16 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
+<<<<<<< HEAD
+=======
+              Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
               const SizedBox(height: 60),
               // Logo
               const CircleAvatar(
@@ -58,9 +68,13 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.center,
                 child: TextButton(
                   onPressed: () {
+<<<<<<< HEAD
                     // Your login logic here
                     Navigator.pushNamed(context, '/home_page');
                     // Navigator.pushReplacementNamed(context, '/home');
+=======
+                    Navigator.pushNamed(context, '/home_screen');
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

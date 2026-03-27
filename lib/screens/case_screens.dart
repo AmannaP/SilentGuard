@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 
 void main() {
   runApp(const MyApp());
@@ -6,6 +7,16 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+=======
+import 'call_screen.dart';
+
+void main() {
+  runApp(const CaseScreens());
+}
+
+class CaseScreens extends StatelessWidget {
+  const CaseScreens({super.key});
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +145,7 @@ class _IncidentCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
+<<<<<<< HEAD
                 Text('Incident No.1',
                     style: TextStyle(
                         color: Colors.white,
@@ -148,6 +160,31 @@ class _IncidentCard extends StatelessWidget {
                 SizedBox(height: 2),
                 Text('Open',
                     style: TextStyle(color: Colors.white70, fontSize: 12)),
+=======
+                Text(
+                  'Incident No.1',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  '02/02/2026',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Rape Case',
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Open',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
               ],
             ),
           ),
@@ -166,6 +203,7 @@ class _IncidentCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
+<<<<<<< HEAD
                   const Text('Online',
                       style: TextStyle(color: Colors.white, fontSize: 12)),
                 ],
@@ -173,6 +211,19 @@ class _IncidentCard extends StatelessWidget {
               const SizedBox(height: 4),
               const Text('Help Desk Active',
                   style: TextStyle(color: Colors.white70, fontSize: 11)),
+=======
+                  const Text(
+                    'Online',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Help Desk Active',
+                style: TextStyle(color: Colors.white70, fontSize: 11),
+              ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             ],
           ),
         ],
@@ -215,6 +266,7 @@ class _MessageBubble extends StatelessWidget {
               color: Colors.black.withOpacity(0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
+<<<<<<< HEAD
             )
           ],
         ),
@@ -224,10 +276,25 @@ class _MessageBubble extends StatelessWidget {
           children: [
             Text(text,
                 style: const TextStyle(fontSize: 14, color: Colors.black87)),
+=======
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Text(
+              text,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+<<<<<<< HEAD
                 Text(time,
                     style: TextStyle(
                         fontSize: 10, color: Colors.grey.shade500)),
@@ -235,6 +302,15 @@ class _MessageBubble extends StatelessWidget {
                   const SizedBox(width: 4),
                   Icon(Icons.done_all,
                       size: 12, color: Colors.blue.shade400),
+=======
+                Text(
+                  time,
+                  style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
+                ),
+                if (isMe) ...[
+                  const SizedBox(width: 4),
+                  Icon(Icons.done_all, size: 12, color: Colors.blue.shade400),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                 ],
               ],
             ),
@@ -269,8 +345,15 @@ class _MessageInputBar extends StatelessWidget {
               child: GestureDetector(
                 onTap: onCallTap,
                 child: Container(
+<<<<<<< HEAD
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+=======
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -279,7 +362,11 @@ class _MessageInputBar extends StatelessWidget {
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
+<<<<<<< HEAD
                       )
+=======
+                      ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ],
                   ),
                   child: Row(
@@ -288,6 +375,7 @@ class _MessageInputBar extends StatelessWidget {
                       CircleAvatar(
                         radius: 14,
                         backgroundColor: const Color(0xFFD4793A),
+<<<<<<< HEAD
                         child: const Icon(Icons.phone,
                             size: 14, color: Colors.white),
                       ),
@@ -295,6 +383,22 @@ class _MessageInputBar extends StatelessWidget {
                       const Text('Make a Call',
                           style: TextStyle(
                               fontWeight: FontWeight.w600, fontSize: 13)),
+=======
+                        child: const Icon(
+                          Icons.phone,
+                          size: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Make a Call',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ],
                   ),
                 ),
@@ -305,6 +409,7 @@ class _MessageInputBar extends StatelessWidget {
           // Text field bar
           Container(
             color: Colors.grey.shade100,
+<<<<<<< HEAD
             padding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
@@ -312,6 +417,16 @@ class _MessageInputBar extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.camera_alt_outlined,
                       color: Colors.grey),
+=======
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.grey,
+                  ),
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                   onPressed: () {},
                 ),
                 IconButton(
@@ -349,6 +464,7 @@ class _MessageInputBar extends StatelessWidget {
     );
   }
 }
+<<<<<<< HEAD
 
 // ─────────────────────────────────────────────
 // CALL SCREEN PAGE
@@ -584,3 +700,5 @@ class _DialKey extends StatelessWidget {
     );
   }
 }
+=======
+>>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
