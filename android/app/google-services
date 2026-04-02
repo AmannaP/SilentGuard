@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "504068679300",
+    "project_id": "silentguard-6a579",
+    "storage_bucket": "silentguard-6a579.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:504068679300:android:21511b3d96e93841bc04d1",
+        "android_client_info": {
+          "package_name": "com.example.silent_guard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwWSce74008yrRhNwKtUOwaT_WjJUFsbM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

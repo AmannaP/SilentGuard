@@ -1,13 +1,91 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
+import 'package:geolocator/geolocator.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
+import '../services/tracking_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   final Color _themeOrange = const Color(0xFFD4793A);
+  final TrackingService _trackingService = TrackingService();
+  String _currentAddress = "Locating...";
+  Position? _currentPosition;
+  bool _isTriggering = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initLocation();
+  }
+
+  Future<void> _initLocation() async {
+    debugPrint("--- Initializing Location ---");
+    final position = await _trackingService.getCurrentLocation();
+    if (mounted) {
+      setState(() {
+        if (position != null) {
+          _currentPosition = position;
+          _currentAddress = "${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}";
+          debugPrint("Location Found: $_currentAddress");
+        } else {
+          _currentAddress = "Location unavailable";
+          debugPrint("Location could not be fetched.");
+        }
+      });
+    }
+  }
+
+  Future<void> _triggerSOS() async {
+    debugPrint("--- SOS Long Press Detected ---");
+    
+    if (_isTriggering) return;
+
+    setState(() => _isTriggering = true);
+
+    try {
+      if (_currentPosition == null) {
+        debugPrint("Position null, attempting to fetch...");
+        _currentPosition = await _trackingService.getCurrentLocation();
+      }
+
+      if (_currentPosition == null) {
+        debugPrint("Position still null after retry.");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error: GPS location not found. Please enable GPS.')),
+          );
+        }
+        setState(() => _isTriggering = false);
+        return;
+      }
+
+      debugPrint("Triggering SOS API in Firestore...");
+      final requestId = await _trackingService.triggerSOS(_currentPosition!);
+      debugPrint("SOS Triggered! Request ID: $requestId");
+
+      if (mounted) {
+        Navigator.pushNamed(
+          context,
+          '/map_tracking',
+          arguments: requestId,
+        );
+      }
+    } catch (e) {
+      debugPrint("SOS Trigger Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to trigger SOS: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isTriggering = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,22 +117,21 @@ class HomeScreen extends StatelessWidget {
                           style: TextStyle(color: Colors.black54, fontSize: 12),
                         ),
                         Row(
-                          children: const [
-<<<<<<< HEAD
-                            Icon(Icons.location_on, size: 14, color: Colors.black),
-=======
-                            Icon(
+                          children: [
+                            const Icon(
                               Icons.location_on,
                               size: 14,
                               color: Colors.black,
                             ),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
-                            SizedBox(width: 4),
-                            Text(
-                              "Accra, Ghana",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                _currentAddress,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ],
@@ -76,7 +153,6 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 20),
-                    // --- Emergency Section ---
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -106,7 +182,6 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        // Illustration Placeholder
                         Expanded(
                           flex: 2,
                           child: Container(
@@ -126,22 +201,15 @@ class HomeScreen extends StatelessWidget {
                     // --- SOS Button ---
                     Center(
                       child: GestureDetector(
-<<<<<<< HEAD
-                        onTap: () => Navigator.pushNamed(context, '/map_tracking'),
-=======
-                        onLongPress: () => Navigator.pushNamed(
-                          context,
-                          '/map_tracking_screen',
-                        ),
+                        onLongPress: _triggerSOS,
                         onTap: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Press and hold for 3 seconds to activate SOS'),
+                              content: Text('Press and hold the SOS button to activate'),
                               duration: Duration(seconds: 2),
                             ),
                           );
                         },
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                         child: Container(
                           width: 220,
                           height: 220,
@@ -163,37 +231,33 @@ class HomeScreen extends StatelessWidget {
                                   color: Colors.black26,
                                   blurRadius: 15,
                                   offset: Offset(0, 8),
-<<<<<<< HEAD
-                                )
-=======
                                 ),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                               ],
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  "SOS",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
+                            child: Center(
+                              child: _isTriggering 
+                                ? const CircularProgressIndicator(color: Colors.white)
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Text(
+                                        "SOS",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 48,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Hold to activate",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                Text(
-<<<<<<< HEAD
-                                  "Press 3 for\nsecond",
-=======
-                                  "Hold for 3\nseconds",
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
                         ),
@@ -202,7 +266,6 @@ class HomeScreen extends StatelessWidget {
 
                     const SizedBox(height: 40),
 
-                    // --- Quick Actions ---
                     const Text(
                       "Quick Actions",
                       style: TextStyle(
@@ -212,11 +275,6 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 15),
-<<<<<<< HEAD
-                    _buildActionItem(Icons.medical_services, "Upload Evidence", Colors.green.shade100),
-                    _buildActionItem(Icons.phone_in_talk, "Place a call", Colors.blue.shade100),
-                    _buildActionItem(Icons.mic, "Record Evidence", Colors.purple.shade100),
-=======
                     _buildActionItem(
                       Icons.medical_services,
                       "Upload Evidence",
@@ -235,8 +293,7 @@ class HomeScreen extends StatelessWidget {
                       Colors.purple.shade100,
                       onTap: () => Navigator.pushNamed(context, '/record_evidence_screen'),
                     ),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
-                    const SizedBox(height: 100), // Space for Bottom Nav
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -244,26 +301,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // Custom Bottom Navigation
-<<<<<<< HEAD
-      bottomSheet: Container(
-        height: 90,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home, "Home", true),
-            _buildNavItem(Icons.history, "History", false, onTap: () => Navigator.pushNamed(context, '/case_history')),
-            _buildNavItem(Icons.explore_outlined, "Archive", false),
-            _buildNavItem(Icons.person_outline, "Profile", false),
-=======
       bottomNavigationBar: const CustomBottomNavBar(currentIndex: 0),
     );
   }
@@ -295,63 +332,9 @@ class HomeScreen extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ],
         ),
       ),
     );
   }
-<<<<<<< HEAD
-
-  Widget _buildActionItem(IconData icon, String label, Color iconBg) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 20),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, bool isActive, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: isActive ? _themeOrange : Colors.grey, size: 28),
-          Text(
-            label,
-            style: TextStyle(
-              color: isActive ? _themeOrange : Colors.grey,
-              fontSize: 12,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-=======
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 }

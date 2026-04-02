@@ -1,18 +1,11 @@
-<<<<<<< HEAD
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-=======
-import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import '../services/tracking_service.dart';
 import 'call_screen.dart';
-import 'case_screens.dart';
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
 
 class MapTrackingScreen extends StatefulWidget {
   const MapTrackingScreen({super.key});
@@ -22,47 +15,48 @@ class MapTrackingScreen extends StatefulWidget {
 }
 
 class _MapTrackingScreenState extends State<MapTrackingScreen> {
-<<<<<<< HEAD
   final Color _themeOrange = const Color(0xFFD4793A);
+  final TrackingService _trackingService = TrackingService();
 
   final MapController _mapController = MapController();
+  final TextEditingController _userLocationController = TextEditingController(text: "Locating...");
 
   LatLng? userLatLng;
   LatLng? helperLatLng;
-
-  final String requestId = "demo_request_123";
+  String? requestId;
+  String _etaText = "Waiting for help...";
 
   StreamSubscription<Position>? _positionStream;
+  StreamSubscription<DocumentSnapshot>? _requestSubscription;
 
   @override
-  void initState() {
-    super.initState();
-    _initTracking();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (requestId == null) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is String) {
+        requestId = args;
+      } else {
+        requestId = "demo_request_123";
+      }
+      _initTracking();
+    }
   }
 
   @override
   void dispose() {
     _positionStream?.cancel();
+    _requestSubscription?.cancel();
+    _userLocationController.dispose();
     super.dispose();
   }
 
-  // ===============================
-  //  INIT TRACKING
-  // ===============================
   Future<void> _initTracking() async {
-    // Request permission
-    LocationPermission permission = await Geolocator.requestPermission();
-
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      return;
-    }
-
-    // USER LOCATION STREAM
+    // Start listening to user position
     _positionStream = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
+        distanceFilter: 5,
       ),
     ).listen((position) {
       final latLng = LatLng(position.latitude, position.longitude);
@@ -70,109 +64,78 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
       if (mounted) {
         setState(() {
           userLatLng = latLng;
+          _userLocationController.text = "${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}";
         });
       }
 
-      _updateUserLocation(position.latitude, position.longitude);
-
+      if (requestId != null) {
+        _trackingService.updateUserLocation(requestId!, position);
+      }
       _moveCamera(latLng);
     });
 
-    // HELPER LISTENER (Firebase)
-    FirebaseFirestore.instance
-        .collection('tracking')
-        .doc(requestId)
-        .snapshots()
-        .listen((doc) {
-      if (!doc.exists) return;
+    // Listen to helper updates via Service
+    if (requestId != null) {
+      _requestSubscription = _trackingService.getRequestStream(requestId!).listen((doc) {
+        if (!doc.exists) return;
 
-      final data = doc.data();
-      if (data == null || data['helper'] == null) return;
+        final data = doc.data() as Map<String, dynamic>?;
+        if (data == null) return;
 
-      final helper = data['helper'];
-
-      if (mounted) {
-        setState(() {
-          helperLatLng = LatLng(helper['lat'], helper['lng']);
-        });
-      }
-    });
-  }
-
-  // ===============================
-  // 📡 FIREBASE UPDATE
-  // ===============================
-  Future<void> _updateUserLocation(double lat, double lng) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('tracking')
-          .doc(requestId)
-          .set({
-        'user': {
-          'lat': lat,
-          'lng': lng,
+        if (mounted) {
+          setState(() {
+            if (data['helper'] != null) {
+              helperLatLng = LatLng(data['helper']['lat'], data['helper']['lng']);
+              _etaText = data['eta'] ?? "Help is on the way";
+            } else {
+              _etaText = "Finding nearest help...";
+            }
+            
+            if (data['status'] == 'resolved' || data['status'] == 'cancelled') {
+              _showCompletionDialog(data['status']);
+            }
+          });
         }
-      }, SetOptions(merge: true));
-    } catch (e) {
-      debugPrint("Error updating location: $e");
+      });
     }
   }
 
-  // ===============================
-  // 🎥 CAMERA CONTROL
-  // ===============================
-  void _moveCamera(LatLng position) {
-    _mapController.move(position, 14.0);
-  }
-
-  // ===============================
-  // UI
-  // ===============================
-=======
-  final Color _themeOrange = const Color(0xFFCD7F32);
-  final TextEditingController _userLocationController = TextEditingController(text: "Locating...");
-  
-  LatLng _userPosition = const LatLng(5.6037, -0.1870); // Placeholder Accra
-  final LatLng _helperPosition = const LatLng(5.6150, -0.1900); // Nearby helper
-  
-  final MapController _mapController = MapController();
-
-  @override
-  void initState() {
-    super.initState();
-    _initBackgroundGeolocation();
-  }
-
-  void _initBackgroundGeolocation() async {
-    // Listen to location events
-    bg.BackgroundGeolocation.onLocation((bg.Location location) {
-      if (mounted) {
-        setState(() {
-          _userPosition = LatLng(location.coords.latitude, location.coords.longitude);
-          _userLocationController.text = "${location.coords.latitude.toStringAsFixed(4)}, ${location.coords.longitude.toStringAsFixed(4)}";
-          _mapController.move(_userPosition, 15.0);
-        });
-      }
-    });
-
-    bg.BackgroundGeolocation.onProviderChange((bg.ProviderChangeEvent event) {
-      debugPrint('[onProviderChange] - $event');
-    });
-
-    // Configure Background Geolocation
-    await bg.BackgroundGeolocation.ready(bg.Config(
-      desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
-      distanceFilter: 10.0,
-      stopOnTerminate: false,
-      startOnBoot: true,
-      debug: true,
-      logLevel: bg.Config.LOG_LEVEL_VERBOSE
-    ));
+  void _showCompletionDialog(String status) {
+    _positionStream?.cancel();
+    _requestSubscription?.cancel();
     
-    bg.BackgroundGeolocation.start();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(status == 'resolved' ? "Help Arrived" : "Request Cancelled"),
+        content: Text(status == 'resolved' 
+          ? "The emergency request has been marked as resolved." 
+          : "The emergency request was cancelled."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); 
+              Navigator.of(context).pop(); 
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
+  Future<void> _handleCancel() async {
+    if (requestId != null) {
+      await _trackingService.cancelSOS(requestId!);
+    }
+    if (mounted) Navigator.pop(context);
+  }
+
+  void _moveCamera(LatLng position) {
+    _mapController.move(position, 15.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -180,57 +143,6 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-<<<<<<< HEAD
-            // ===============================
-            //  LOCATION BOX
-            // ===============================
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: _themeOrange,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.white, width: 1.5),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      const Icon(Icons.location_on, color: Colors.black),
-                      const SizedBox(height: 5),
-                      Column(
-                        children: List.generate(
-                          4,
-                              (index) => Container(
-                            margin: const EdgeInsets.symmetric(vertical: 2),
-                            width: 3,
-                            height: 3,
-                            decoration: const BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Icon(Icons.directions_car, color: Colors.black),
-                    ],
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: Column(
-                      children: [
-                        _buildLocationField("Your location"),
-                        const SizedBox(height: 10),
-                        _buildLocationField("Helper's location"),
-                      ],
-                    ),
-                  )
-=======
-            // --- Top Location Selection ---
              Container(
               margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
               padding: const EdgeInsets.all(20),
@@ -248,37 +160,27 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
                 children: [
                   _buildEditableLocationBox(Icons.location_on, "Your location", _userLocationController),
                   const SizedBox(height: 15),
-                  _buildLocationBox(Icons.directions_car, "Helper's location (Tracking...)", false),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
+                  _buildLocationBox(
+                    Icons.directions_car, 
+                    helperLatLng != null ? "Helper is moving" : "Finding Helper...", 
+                    false
+                  ),
                 ],
               ),
             ),
 
-<<<<<<< HEAD
-            // ===============================
-            // MAP (using flutter_map)
-            // ===============================
-=======
-            // --- Map Area ---
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             Expanded(
               child: Stack(
                 children: [
                   FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-<<<<<<< HEAD
-                      initialCenter: const LatLng(6.5244, 3.3792),
-                      initialZoom: 14,
-=======
-                      initialCenter: _userPosition,
+                      initialCenter: userLatLng ?? const LatLng(5.6037, -0.1870), 
                       initialZoom: 14.0,
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ),
                     children: [
                       TileLayer(
                         urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-<<<<<<< HEAD
                         userAgentPackageName: 'com.example.silent_guard',
                       ),
                       MarkerLayer(
@@ -286,67 +188,21 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
                           if (userLatLng != null)
                             Marker(
                               point: userLatLng!,
-                              width: 80,
-                              height: 80,
-                              child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                              width: 50,
+                              height: 50,
+                              child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 40),
                             ),
                           if (helperLatLng != null)
                             Marker(
                               point: helperLatLng!,
-                              width: 80,
-                              height: 80,
-                              child: const Icon(Icons.directions_car, color: Colors.blue, size: 40),
+                              width: 50,
+                              height: 50,
+                              child: const Icon(Icons.directions_car, color: Colors.red, size: 40),
                             ),
-=======
-                        userAgentPackageName: 'com.example.silentguard',
-                      ),
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            point: _userPosition,
-                            width: 50,
-                            height: 50,
-                            child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 40),
-                          ),
-                          Marker(
-                            point: _helperPosition,
-                            width: 50,
-                            height: 50,
-                            child: const Icon(Icons.directions_car, color: Colors.red, size: 40),
-                          ),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                         ],
                       ),
                     ],
                   ),
-<<<<<<< HEAD
-
-                  // 📞 CALL BUTTON
-                  Positioned(
-                    right: 20,
-                    bottom: 20,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black26, blurRadius: 5)
-                        ],
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.phone, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            "Call",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-=======
-                  // Floating action buttons on map
                   Positioned(
                     bottom: 20,
                     right: 20,
@@ -357,75 +213,12 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
                         const SizedBox(width: 10),
                         _buildCallButton(context),
                       ],
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                     ),
                   ),
                 ],
               ),
             ),
 
-<<<<<<< HEAD
-            // ===============================
-            // BOTTOM SECTION
-            // ===============================
-            Container(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                children: [
-                  // ETA BOX
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Colors.white.withOpacity(0.6)),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Column(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.directions_car,
-                                color: Colors.white, size: 32),
-                            SizedBox(width: 15),
-                            Text(
-                              "Help is 10 mins away",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Divider(color: Colors.white54),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // CANCEL BUTTON
-                  SizedBox(
-                    width: 160,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                      ),
-                      child: const Text(
-                        "✕ Cancel",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-=======
-            // --- Bottom Info Section ---
             Container(
               margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
@@ -441,12 +234,12 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
               ),
               child: Column(
                 children: [
-                   // ETA
-                  const Text(
-                    "Help is 10 mins away",
-                    style: TextStyle(
+                  Text(
+                    _etaText,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
                       color: Color(0xFFF5F5FA),
-                      fontSize: 24,
+                      fontSize: 22,
                       fontFamily: 'DM Sans',
                       fontWeight: FontWeight.w800,
                     ),
@@ -456,14 +249,13 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
                   const Divider(color: Colors.white),
                   const SizedBox(height: 15),
 
-                  // Cancel Button
                   SizedBox(
                     height: 45,
                     child: ElevatedButton.icon(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: _handleCancel,
                       icon: const Icon(Icons.close, color: Colors.black, size: 20),
                       label: const Text(
-                        "Cancel",
+                        "Cancel SOS",
                         style: TextStyle(
                           color: Colors.black, 
                           fontSize: 16,
@@ -475,42 +267,19 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
                         backgroundColor: const Color(0xFFED0C20),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-<<<<<<< HEAD
-            )
-=======
             ),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ],
         ),
       ),
     );
   }
 
-<<<<<<< HEAD
-  // ===============================
-  // REUSABLE FIELD
-  // ===============================
-  Widget _buildLocationField(String text) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.black87,
-          fontWeight: FontWeight.w500,
-=======
   Widget _buildEditableLocationBox(IconData icon, String label, TextEditingController controller) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
@@ -532,6 +301,7 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
           Expanded(
             child: TextField(
               controller: controller,
+              readOnly: true,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: label,
@@ -569,13 +339,15 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
         children: [
           Icon(icon, color: Colors.black87),
           const SizedBox(width: 15),
-          Text(
-            text,
-            style: const TextStyle(
-              color: Color(0xFF18191C),
-              fontSize: 14,
-              fontFamily: 'DM Sans',
-              fontWeight: FontWeight.w700,
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Color(0xFF18191C),
+                fontSize: 14,
+                fontFamily: 'DM Sans',
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -635,10 +407,7 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
   Widget _buildMessageButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CaseDetailsPage()),
-        );
+        Navigator.pushNamed(context, '/case_screens');
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
@@ -667,7 +436,7 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
             ),
             const SizedBox(width: 10),
             const Text(
-              "Message",
+              "Chat",
               style: TextStyle(
                 color: Color(0xFF313A51),
                 fontSize: 14,
@@ -676,7 +445,6 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
               ),
             ),
           ],
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
         ),
       ),
     );

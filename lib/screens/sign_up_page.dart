@@ -10,47 +10,46 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
   // Controllers to capture input data
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _occupationController = TextEditingController();
-  final TextEditingController _emergencyContactController =
-      TextEditingController();
-  final TextEditingController _emergencyNameController =
-      TextEditingController();
+  final TextEditingController _emergencyContactController = TextEditingController();
+  final TextEditingController _emergencyNameController = TextEditingController();
 
-  // Variables for dropdowns (Renel Ghana demographic data)
+  // Variables for dropdowns
   String? _selectedRegion;
   String? _selectedMaritalStatus;
   String? _selectedGender;
 
   final List<String> _ghanaRegions = [
-    "Ahafo",
-    "Ashanti",
-    "Bono",
-    "Bono East",
-    "Central",
-    "Eastern",
-    "Greater Accra",
-    "Northern",
-    "North East",
-    "Oti",
-    "Savannah",
-    "Upper East",
-    "Upper West",
-    "Volta",
-    "Western",
-    "Western North",
+    "Ahafo", "Ashanti", "Bono", "Bono East", "Central", "Eastern",
+    "Greater Accra", "Northern", "North East", "Oti", "Savannah",
+    "Upper East", "Upper West", "Volta", "Western", "Western North",
   ];
 
-  final Color _themeOrange = const Color(
-    0xFFD4833B,
-  ); // Matching your Figma background
+  final Color _themeOrange = const Color(0xFFD4833B);
+
+  @override
+  void dispose() {
+    // Dispose all controllers to prevent memory leaks
+    _pageController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _occupationController.dispose();
+    _emergencyContactController.dispose();
+    _emergencyNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,16 +58,6 @@ class _SignUpPageState extends State<SignUpPage> {
       body: SafeArea(
         child: Column(
           children: [
-<<<<<<< HEAD
-            const SizedBox(height: 20),
-            // Logo Placeholder (Replace with your Image.asset)
-            const CircleAvatar(
-              radius: 40,
-              backgroundColor: Colors.black,
-              child: Icon(Icons.shield, color: Colors.white, size: 40),
-            ),
-            const SizedBox(height: 10),
-=======
             Align(
               alignment: Alignment.topLeft,
               child: IconButton(
@@ -77,14 +66,12 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
             ),
             const SizedBox(height: 5),
-            // Logo Placeholder (Replace with your Image.asset)
             const CircleAvatar(
               radius: 30,
               backgroundColor: Colors.black,
               child: Icon(Icons.shield, color: Colors.white, size: 30),
             ),
             const SizedBox(height: 5),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
             const Text(
               "Welcome to SilentGuard",
               style: TextStyle(
@@ -102,8 +89,7 @@ class _SignUpPageState extends State<SignUpPage> {
               child: PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (int page) =>
-                    setState(() => _currentPage = page),
+                onPageChanged: (int page) => setState(() => _currentPage = page),
                 children: [_buildPageOne(), _buildPageTwo()],
               ),
             ),
@@ -113,14 +99,9 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // --- PAGE 1: Personal Info & Password ---
   Widget _buildPageOne() {
     return SingleChildScrollView(
-<<<<<<< HEAD
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-=======
       padding: const EdgeInsets.fromLTRB(30, 20, 30, 100),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       child: Column(
         children: [
           _buildTextField("First Name", _firstNameController),
@@ -128,11 +109,7 @@ class _SignUpPageState extends State<SignUpPage> {
           _buildTextField("Email", _emailController),
           _buildTextField("Contact Number", _phoneController),
           _buildTextField("Password", _passwordController, isPassword: true),
-          _buildTextField(
-            "Confirm Password",
-            _confirmPasswordController,
-            isPassword: true,
-          ),
+          _buildTextField("Confirm Password", _confirmPasswordController, isPassword: true),
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerRight,
@@ -152,14 +129,9 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // --- PAGE 2: Demographics & Emergency ---
   Widget _buildPageTwo() {
     return SingleChildScrollView(
-<<<<<<< HEAD
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-=======
       padding: const EdgeInsets.fromLTRB(30, 20, 30, 100),
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -175,16 +147,8 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
           Row(
             children: [
-              _buildRadioButton(
-                "Single",
-                _selectedMaritalStatus,
-                (v) => setState(() => _selectedMaritalStatus = v),
-              ),
-              _buildRadioButton(
-                "Married",
-                _selectedMaritalStatus,
-                (v) => setState(() => _selectedMaritalStatus = v),
-              ),
+              _buildRadioButton("Single", _selectedMaritalStatus, (v) => setState(() => _selectedMaritalStatus = v)),
+              _buildRadioButton("Married", _selectedMaritalStatus, (v) => setState(() => _selectedMaritalStatus = v)),
             ],
           ),
 
@@ -195,82 +159,47 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
           Row(
             children: [
-              _buildRadioButton(
-                "Man",
-                _selectedGender,
-                (v) => setState(() => _selectedGender = v),
-              ),
-              _buildRadioButton(
-                "Woman",
-                _selectedGender,
-                (v) => setState(() => _selectedGender = v),
-              ),
+              _buildRadioButton("Man", _selectedGender, (v) => setState(() => _selectedGender = v)),
+              _buildRadioButton("Woman", _selectedGender, (v) => setState(() => _selectedGender = v)),
             ],
           ),
 
           const SizedBox(height: 30),
-<<<<<<< HEAD
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                // Handle Finish Logic
-                Navigator.pushNamed(context, '/login_page');
-              },
-              child: const Text(
-                "Finish >",
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-            ),
-=======
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Internal Back Button (Page 2 -> Page 1)
               TextButton(
                 onPressed: () => _pageController.previousPage(
                   duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                 ),
-                child: const Text(
-                  "< Back",
-                  style: TextStyle(color: Colors.white70, fontSize: 18),
-                ),
+                child: const Text("< Back", style: TextStyle(color: Colors.white70, fontSize: 18)),
               ),
               TextButton(
                 onPressed: () {
-                  // Handle Finish Logic
+                  // Perform basic validation before finishing
+                  if (_firstNameController.text.isEmpty || _emailController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please fill in required fields')),
+                    );
+                    return;
+                  }
                   Navigator.pushNamed(context, '/login_page');
                 },
-                child: const Text(
-                  "Finish >",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
+                child: const Text("Finish >", style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ],
->>>>>>> 7d99e79e84dea3781a33b5662d6f7cf5a88beeef
           ),
         ],
       ),
     );
   }
 
-  // Reusable Component for White Fields
-  Widget _buildTextField(
-    String label,
-    TextEditingController? controller, {
-    bool isPassword = false,
-  }) {
+  Widget _buildTextField(String label, TextEditingController? controller, {bool isPassword = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
         const SizedBox(height: 5),
         TextField(
           controller: controller,
@@ -278,14 +207,8 @@ class _SignUpPageState extends State<SignUpPage> {
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 10,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
         ),
         const SizedBox(height: 15),
@@ -293,33 +216,21 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // 2. SPECIFIC REGION DROPDOWN
   Widget _buildRegionDropdown() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Region",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
+        const Text("Region", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
         const SizedBox(height: 5),
         DropdownButtonFormField<String>(
           value: _selectedRegion,
-          items: _ghanaRegions.map((String region) {
-            return DropdownMenuItem(value: region, child: Text(region));
-          }).toList(),
+          items: _ghanaRegions.map((String region) => DropdownMenuItem(value: region, child: Text(region))).toList(),
           onChanged: (newValue) => setState(() => _selectedRegion = newValue),
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 10,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
           dropdownColor: Colors.white,
         ),
@@ -328,20 +239,10 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  // Custom Radio Button for that Figma look
-  Widget _buildRadioButton(
-    String value,
-    String? groupValue,
-    Function(String?) onChanged,
-  ) {
+  Widget _buildRadioButton(String value, String? groupValue, Function(String?) onChanged) {
     return Row(
       children: [
-        Radio<String>(
-          value: value,
-          groupValue: groupValue,
-          activeColor: Colors.white,
-          onChanged: onChanged,
-        ),
+        Radio<String>(value: value, groupValue: groupValue, activeColor: Colors.white, onChanged: onChanged),
         Text(value, style: const TextStyle(color: Colors.white)),
       ],
     );
