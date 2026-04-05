@@ -34,7 +34,7 @@ class MapTrackingScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                child: Center(
+                child: const Center(
                   child: Icon(Icons.location_pin, color: Colors.red, size: 40),
                 ),
               ),
@@ -56,13 +56,13 @@ class MapTrackingScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: [
                           Icon(Icons.phone, size: 20),
                           SizedBox(width: 8),
                           Text("Call", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -80,8 +80,8 @@ class MapTrackingScreen extends StatelessWidget {
                       border: Border.all(color: Colors.white.withOpacity(0.5)),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Row(
-                      children: const [
+                    child: const Row(
+                      children: [
                         Icon(Icons.directions_car, color: Colors.white, size: 32),
                         SizedBox(width: 15),
                         Text(
@@ -132,7 +132,7 @@ class MapTrackingScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
         ],
       ),

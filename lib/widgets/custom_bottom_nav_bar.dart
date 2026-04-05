@@ -8,8 +8,7 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 90,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -33,7 +32,7 @@ class CustomBottomNavBar extends StatelessWidget {
               icon: Icons.home,
               label: "Home",
               isActive: currentIndex == 0,
-              route: '/home_screen',
+              route: '/home_page',
             ),
             _buildNavItem(
               context,
@@ -69,7 +68,7 @@ class CustomBottomNavBar extends StatelessWidget {
     required bool isActive,
     required String route,
   }) {
-    final themeOrange = const Color(0xFFD4793A);
+    const themeOrange = Color(0xFFD4793A);
     final color = isActive ? themeOrange : Colors.grey;
     final fontWeight = isActive ? FontWeight.bold : FontWeight.normal;
 

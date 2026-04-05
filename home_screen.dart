@@ -26,16 +26,16 @@ class HomeScreen extends StatelessWidget {
                     child: Icon(Icons.bolt, color: _themeOrange, size: 28),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Current location",
                           style: TextStyle(color: Colors.black54, fontSize: 12),
                         ),
                         Row(
-                          children: const [
+                          children: [
                             Icon(Icons.location_on, size: 14, color: Colors.black),
                             SizedBox(width: 4),
                             Text(
@@ -68,11 +68,11 @@ class HomeScreen extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
+                        const Expanded(
                           flex: 3,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 "Are you in an\nemergency?",
                                 style: TextStyle(
@@ -139,9 +139,9 @@ class HomeScreen extends StatelessWidget {
                                 )
                               ],
                             ),
-                            child: Column(
+                            child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
+                              children: [
                                 Text(
                                   "SOS",
                                   style: TextStyle(

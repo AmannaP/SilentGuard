@@ -156,11 +156,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
+                        const Expanded(
                           flex: 3,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 "Are you in an\nemergency?",
                                 style: TextStyle(
@@ -237,9 +237,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Center(
                               child: _isTriggering 
                                 ? const CircularProgressIndicator(color: Colors.white)
-                                : Column(
+                                : const Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
+                                    children: [
                                       Text(
                                         "SOS",
                                         style: TextStyle(

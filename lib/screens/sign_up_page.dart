@@ -223,7 +223,7 @@ class _SignUpPageState extends State<SignUpPage> {
         const Text("Region", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
         const SizedBox(height: 5),
         DropdownButtonFormField<String>(
-          value: _selectedRegion,
+          initialValue: _selectedRegion,
           items: _ghanaRegions.map((String region) => DropdownMenuItem(value: region, child: Text(region))).toList(),
           onChanged: (newValue) => setState(() => _selectedRegion = newValue),
           decoration: InputDecoration(

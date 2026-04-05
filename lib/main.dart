@@ -5,7 +5,6 @@ import 'screens/landing_page.dart';
 import 'screens/login_page.dart';
 import 'screens/sign_up_page.dart';
 import 'screens/case_history.dart';
-import 'screens/case_screens.dart';
 import 'screens/home_screen.dart';
 import 'screens/map_tracking_screen.dart';
 import 'screens/archive_screen.dart';
@@ -41,7 +40,6 @@ class SilentGuardApp extends StatelessWidget {
         '/': (context) => const LandingPage(),
         '/login_page': (context) => const LoginPage(),
         '/sign_up_page': (context) => const SignUpPage(),
-        '/case_screens': (context) => const CaseScreens(),
         '/profile': (context) => const ProfilePage(),
         '/case_history': (context) => const CaseHistory(),
         '/home_page': (context) => const HomeScreen(),
