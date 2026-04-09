@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,6 +12,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final Color _themeOrange = const Color(0xFFD4833B);
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +65,25 @@ class _LoginPageState extends State<LoginPage> {
               // Login Button (Matches Figma text style)
               Align(
                 alignment: Alignment.center,
-                child: TextButton(
-                  onPressed: () {
-                    // Your login logic here
-                    Navigator.pushNamed(context, '/home_page');
+                child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : TextButton(
+                  onPressed: () async {
+                    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+                      return;
+                    }
+                    setState(() => _isLoading = true);
+                    try {
+                      await AuthService().login(_emailController.text.trim(), _passwordController.text.trim());
+                      if (mounted) {
+                        Navigator.pushReplacementNamed(context, '/home_page');
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: $e')));
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

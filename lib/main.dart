@@ -35,7 +35,7 @@ class SilentGuardApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFCD7F32)),
       ),
       // Set the starting page
-      initialRoute: '/home_page',
+      initialRoute: '/landing_page',
       routes: {
         '/': (context) => const LandingPage(),
         '/login_page': (context) => const LoginPage(),

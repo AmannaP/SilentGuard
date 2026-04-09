@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,6 +11,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _isLoading = false;
 
   // Controllers to capture input data
   final TextEditingController _firstNameController = TextEditingController();
@@ -175,16 +177,41 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 child: const Text("< Back", style: TextStyle(color: Colors.white70, fontSize: 18)),
               ),
-              TextButton(
-                onPressed: () {
+              _isLoading ? const CircularProgressIndicator(color: Colors.white) : TextButton(
+                onPressed: () async {
                   // Perform basic validation before finishing
-                  if (_firstNameController.text.isEmpty || _emailController.text.isEmpty) {
+                  if (_firstNameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty || _phoneController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please fill in required fields')),
+                      const SnackBar(content: Text('Please fill in required fields on both pages')),
                     );
                     return;
                   }
-                  Navigator.pushNamed(context, '/login_page');
+                  if (_passwordController.text != _confirmPasswordController.text) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Passwords do not match')),
+                    );
+                    return;
+                  }
+                  
+                  setState(() => _isLoading = true);
+                  try {
+                    await AuthService().signUp(
+                      email: _emailController.text.trim(),
+                      password: _passwordController.text.trim(),
+                      fullName: '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
+                      phoneNumber: _phoneController.text.trim(),
+                    );
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign up successful! Please log in.')));
+                      Navigator.pushNamed(context, '/login_page');
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign up Failed: $e')));
+                    }
+                  } finally {
+                    if (mounted) setState(() => _isLoading = false);
+                  }
                 },
                 child: const Text("Finish >", style: TextStyle(color: Colors.white, fontSize: 18)),
               ),

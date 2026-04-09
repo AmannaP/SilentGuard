@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+
 // ─────────────────────────────────────────────
 // CALL SCREEN PAGE
 // ─────────────────────────────────────────────
@@ -12,6 +14,7 @@ class CallScreen extends StatefulWidget {
 
 class _CallScreenState extends State<CallScreen> {
   String _dialValue = '';
+  final String _defaultEmergencyNumber = '112'; // Default emergency/help desk number
 
   void _appendDigit(String digit) {
     setState(() => _dialValue += digit);
@@ -131,7 +134,10 @@ class _CallScreenState extends State<CallScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 40),
             child: GestureDetector(
-              onTap: () {},
+              onTap: () async {
+                final numberToCall = _dialValue.isEmpty ? _defaultEmergencyNumber : _dialValue;
+                await FlutterPhoneDirectCaller.callNumber(numberToCall);
+              },
               child: Container(
                 width: 64,
                 height: 64,
@@ -173,7 +179,7 @@ class _DialPad extends StatelessWidget {
     ],
     [
       {'digit': '*', 'sub': ''},
-      {'digit': '0', 'sub': '.'},
+      {'digit': '0', 'sub': '+'},
       {'digit': '#', 'sub': ''},
     ],
   ];
@@ -192,6 +198,11 @@ class _DialPad extends StatelessWidget {
                 digit: key['digit']!,
                 sub: key['sub']!,
                 onTap: () => onDigitTap(key['digit']!),
+                onLongPress: () {
+                  if (key['digit'] == '0') {
+                    onDigitTap('+');
+                  }
+                },
               );
             }).toList(),
           ),
@@ -205,13 +216,20 @@ class _DialKey extends StatelessWidget {
   final String digit;
   final String sub;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
-  const _DialKey({required this.digit, required this.sub, required this.onTap});
+  const _DialKey({
+    required this.digit,
+    required this.sub,
+    required this.onTap,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         width: 72,
         height: 72,
@@ -235,7 +253,7 @@ class _DialKey extends StatelessWidget {
                 sub,
                 style: const TextStyle(
                   color: Colors.white70,
-                  fontSize: 9,
+                  fontSize: 12,
                   letterSpacing: 1.5,
                 ),
               ),

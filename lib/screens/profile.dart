@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import '../services/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -10,6 +11,34 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final Color _themeOrange = const Color(0xFFD4833B);
+  String _fullName = "Loading...";
+  String _email = "Loading...";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final uid = AuthService().currentUser?.uid;
+    if (uid != null) {
+       try {
+         final doc = await AuthService().getUserData(uid);
+         if (doc.exists) {
+            final data = doc.data() as Map<String, dynamic>;
+            if (mounted) {
+              setState(() {
+                 _fullName = data['fullName'] ?? 'Unknown User';
+                 _email = data['email'] ?? 'Unknown Email';
+              });
+            }
+         }
+       } catch (e) {
+         // Silently handle error
+       }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,21 +65,21 @@ class _ProfilePageState extends State<ProfilePage> {
                   ), // Replace with your image
                 ),
                 const SizedBox(width: 15),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Itunuoluwa Abidoye",
-                        style: TextStyle(
+                        _fullName,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "@Itunuoluwa",
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                        _email,
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                     ],
                   ),
@@ -98,8 +127,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildMenuItem(
                     Icons.logout,
                     "Log out",
-                    sub: "Further secure your account for safety",
+                    sub: "Sign out of your account",
                     isLast: true,
+                    onTap: () async {
+                      await AuthService().logout();
+                      if (mounted) {
+                        Navigator.pushNamedAndRemoveUntil(context, '/login_page', (route) => false);
+                      }
+                    }
                   ),
                 ]),
 
@@ -152,6 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String? sub,
     Widget? trailing,
     bool isLast = false,
+    VoidCallback? onTap,
   }) {
     return Column(
       children: [
@@ -177,7 +213,7 @@ class _ProfilePageState extends State<ProfilePage> {
           trailing:
               trailing ??
               const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-          onTap: () {},
+          onTap: onTap ?? () {},
         ),
         if (!isLast)
           Divider(

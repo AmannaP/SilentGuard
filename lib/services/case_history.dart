@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA MODELS
@@ -172,5 +174,15 @@ class CaseService {
   Future<String> createCase(CaseModel newCase) async {
     final docRef = await _cases.add(newCase.toMap());
     return docRef.id;
+  }
+
+  Future<String> uploadEvidence(File file, String fileName) async {
+    try {
+      final ref = FirebaseStorage.instance.ref().child('cases_evidence').child(fileName);
+      final uploadTask = await ref.putFile(file);
+      return await uploadTask.ref.getDownloadURL();
+    } catch (e) {
+      return '';
+    }
   }
 }

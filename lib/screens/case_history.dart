@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/case_history.dart'; 
+import 'case_screens.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CASE HISTORY SCREEN
@@ -41,38 +42,58 @@ class _CaseHistoryState extends State<CaseHistory> {
       body: SafeArea(
         child: Column(
           children: [
-            // Refined Professional Search Bar
+            // Search Bar matching original design
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+              padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
               child: Container(
-                height: 48,
-                decoration: BoxDecoration(
+                height: 52,
+                decoration: ShapeDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4))
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  shadows: const [
+                    BoxShadow(
+                      color: Color(0x3FD8D0D0),
+                      blurRadius: 4,
+                      offset: Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (v) => setState(() => _searchQuery = v),
-                  textAlign: TextAlign.left, // Standard left align
-                  style: const TextStyle(fontSize: 15, color: Color(0xFF181D27)),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF181D27),
+                  ),
                   decoration: InputDecoration(
-                    hintText: 'Search in history',
-                    hintStyle: const TextStyle(color: Color(0xFFA0A0A0), fontSize: 15),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    prefixIcon: const Icon(Icons.search, color: Color(0xFFA0A0A0), size: 22),
+                    hintText: 'Search name, type, status, location…',
+                    hintStyle: const TextStyle(
+                      color: Color(0xFFCFC7C7),
+                      fontSize: 14,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Color(0xFFCFC7C7),
+                    ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: Color(0xFFA0A0A0), size: 18),
+                            icon: const Icon(
+                              Icons.clear,
+                              color: Color(0xFFCFC7C7),
+                              size: 18,
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
                             },
                           )
                         : null,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                    ),
                   ),
                 ),
               ),
@@ -87,7 +108,7 @@ class _CaseHistoryState extends State<CaseHistory> {
                     return const Center(child: CircularProgressIndicator(color: Colors.white));
                   }
                   if (snapshot.hasError) {
-                    return Center(child: Text('Connectivity Error. Please check wifi.', style: const TextStyle(color: Colors.white)));
+                    return const Center(child: Text('Connectivity Error. Please check wifi.', style: TextStyle(color: Colors.white)));
                   }
                   final cases = _filter(snapshot.data ?? []);
                   if (cases.isEmpty) {
@@ -117,57 +138,121 @@ class _CaseHistoryState extends State<CaseHistory> {
     );
   }
 
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'resolved':
+      case 'closed':
+        return const Color(0xFF2ECC71);
+      case 'pending':
+      case 'open':
+        return const Color(0xFFE67E22);
+      default:
+        return const Color(0xFFABABAB);
+    }
+  }
+
   Widget _buildCaseCard(CaseModel c) {
+    final statusColor = _statusColor(c.status);
     return GestureDetector(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (_) => CaseDetailsPage(caseModel: c)));
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.white24, width: 1)),
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(14),
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shadows: const [
+            BoxShadow(
+              color: Color(0x1A000000),
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFF0600B3).withOpacity(0.15),
-                shape: BoxShape.circle,
+              width: 44,
+              height: 44,
+              decoration: const ShapeDecoration(
+                color: Color(0x0D0600B3),
+                shape: OvalBorder(),
               ),
-              child: const Icon(Icons.shield, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.folder_outlined,
+                color: Color(0xFF0600B3),
+                size: 22,
+              ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    c.incidentNumber,
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        c.incidentNumber,
+                        style: const TextStyle(
+                          color: Color(0xFF181D27),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          c.status,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
-                    c.date,
-                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11),
+                    '${c.date} • ${c.time}',
+                    style: const TextStyle(
+                      color: Color(0xFFABABAB),
+                      fontSize: 11,
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 5),
                   Text(
                     c.caseType,
-                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Color(0xFF181D27),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${c.status} • Priority: ${c.priorityLevel}',
-                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11),
+                    '${c.victimName} · Priority: ${c.priorityLevel} · ${c.location}',
+                    style: const TextStyle(
+                      color: Color(0xFFABABAB),
+                      fontSize: 11,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.white54),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right, color: Color(0xFFABABAB), size: 20),
           ],
         ),
       ),
@@ -217,6 +302,20 @@ class CaseDetailsPage extends StatelessWidget {
         title: const Text('Case Details', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFFCD7F32), // Bronze
         iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFCD7F32),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.chat),
+        label: const Text('Chat with Officer'),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CaseChatScreen(caseModel: caseModel),
+            ),
+          );
+        },
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -457,7 +556,7 @@ class _NewCasePageState extends State<NewCasePage> {
       
       // Auto-assigners
       final generatedId = 'SG-${now.year}-${now.millisecondsSinceEpoch.toString().substring(8, 12)}';
-      final autoPriority = 'High'; // Can be logic based later
+      const autoPriority = 'High'; // Can be logic based later
       final dateStr = '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}';
       final timeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
       
@@ -566,7 +665,7 @@ class _NewCasePageState extends State<NewCasePage> {
 
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Gender *', border: OutlineInputBorder()),
-                    value: _victimGender,
+                    initialValue: _victimGender,
                     items: ['Female', 'Male', 'Other', 'Prefer not to say']
                         .map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
                     onChanged: (v) => setState(() => _victimGender = v!),
@@ -594,7 +693,7 @@ class _NewCasePageState extends State<NewCasePage> {
 
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Type of GBV Experienced *', border: OutlineInputBorder()),
-                    value: _caseType,
+                    initialValue: _caseType,
                     items: ['Physical', 'Sexual', 'Emotional', 'Economic', 'Other']
                         .map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
                     onChanged: (v) => setState(() => _caseType = v!),

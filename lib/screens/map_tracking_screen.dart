@@ -5,7 +5,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/tracking_service.dart';
+import '../services/case_history.dart';
 import 'call_screen.dart';
+import 'case_screens.dart';
 
 class MapTrackingScreen extends StatefulWidget {
   const MapTrackingScreen({super.key});
@@ -407,7 +409,25 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
   Widget _buildMessageButton(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/case_screens');
+        final sosCase = CaseModel(
+          incidentNumber: 'SOS-${requestId ?? '123'}',
+          priorityLevel: 'High',
+          date: 'Now',
+          time: '',
+          status: 'Emergency',
+          officer: 'Dispatch',
+          victimName: 'Current User',
+          victimDob: '',
+          victimGender: '',
+          victimPhone: '',
+          location: 'Current Location',
+          incidentDate: 'Now',
+          caseType: 'SOS Emergency',
+          description: 'Live SOS Tracking Session',
+          immediateNeeds: [],
+          id: requestId ?? 'admin-tracking', // Fallback ID for chat
+        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CaseChatScreen(caseModel: sosCase)));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
