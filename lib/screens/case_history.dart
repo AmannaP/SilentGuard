@@ -309,11 +309,14 @@ class CaseDetailsPage extends StatelessWidget {
         icon: const Icon(Icons.chat),
         label: const Text('Chat with Officer'),
         onPressed: () {
-          Navigator.push(
+          Navigator.pushNamed(
             context,
-            MaterialPageRoute(
-              builder: (_) => CaseChatScreen(caseModel: caseModel),
-            ),
+            '/chat_provider',
+            arguments: {
+              'uid': caseModel.officer.isNotEmpty && caseModel.officer != 'Awaiting Assignment' ? caseModel.officer : 'renel_ghana_default',
+              'name': caseModel.officer.isNotEmpty && caseModel.officer != 'Awaiting Assignment' ? caseModel.officer : 'Renel Ghana (Default)',
+              'phone': 'N/A',
+            }
           );
         },
       ),

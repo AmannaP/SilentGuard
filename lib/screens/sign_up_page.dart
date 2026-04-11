@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../utils/ui_utils.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -12,6 +13,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   // Controllers to capture input data
   final TextEditingController _firstNameController = TextEditingController();
@@ -110,8 +113,20 @@ class _SignUpPageState extends State<SignUpPage> {
           _buildTextField("Last Name", _lastNameController),
           _buildTextField("Email", _emailController),
           _buildTextField("Contact Number", _phoneController),
-          _buildTextField("Password", _passwordController, isPassword: true),
-          _buildTextField("Confirm Password", _confirmPasswordController, isPassword: true),
+          _buildTextField(
+            "Password", 
+            _passwordController, 
+            isPassword: true, 
+            isObscured: !_isPasswordVisible, 
+            onToggleVisibility: () => setState(() => _isPasswordVisible = !_isPasswordVisible)
+          ),
+          _buildTextField(
+            "Confirm Password", 
+            _confirmPasswordController, 
+            isPassword: true, 
+            isObscured: !_isConfirmPasswordVisible, 
+            onToggleVisibility: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible)
+          ),
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerRight,
@@ -181,14 +196,20 @@ class _SignUpPageState extends State<SignUpPage> {
                 onPressed: () async {
                   // Perform basic validation before finishing
                   if (_firstNameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty || _phoneController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please fill in required fields on both pages')),
+                    UIUtils.showCustomPopup(
+                      context,
+                      title: 'Missing Fields',
+                      message: 'Please fill in all required fields on both pages.',
+                      isSuccess: false,
                     );
                     return;
                   }
                   if (_passwordController.text != _confirmPasswordController.text) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Passwords do not match')),
+                    UIUtils.showCustomPopup(
+                      context,
+                      title: 'Password Mismatch',
+                      message: 'The passwords you entered do not match.',
+                      isSuccess: false,
                     );
                     return;
                   }
@@ -202,12 +223,24 @@ class _SignUpPageState extends State<SignUpPage> {
                       phoneNumber: _phoneController.text.trim(),
                     );
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign up successful! Please log in.')));
-                      Navigator.pushNamed(context, '/login_page');
+                      UIUtils.showCustomPopup(
+                        context,
+                        title: 'Sign Up Successful',
+                        message: 'Your account was created successfully! Please log in.',
+                        isSuccess: true,
+                        onOkay: () {
+                          if (mounted) Navigator.pushNamed(context, '/login_page');
+                        }
+                      );
                     }
                   } catch (e) {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sign up Failed: $e')));
+                      UIUtils.showCustomPopup(
+                        context,
+                        title: 'Sign Up Failed',
+                        message: e.toString(),
+                        isSuccess: false,
+                      );
                     }
                   } finally {
                     if (mounted) setState(() => _isLoading = false);
@@ -222,7 +255,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController? controller, {bool isPassword = false}) {
+  Widget _buildTextField(String label, TextEditingController? controller, {bool isPassword = false, bool? isObscured, VoidCallback? onToggleVisibility}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -230,12 +263,21 @@ class _SignUpPageState extends State<SignUpPage> {
         const SizedBox(height: 5),
         TextField(
           controller: controller,
-          obscureText: isPassword,
+          obscureText: isObscured ?? isPassword,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
             contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            suffixIcon: isPassword && onToggleVisibility != null
+                ? IconButton(
+                    icon: Icon(
+                      (isObscured ?? false) ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.grey,
+                    ),
+                    onPressed: onToggleVisibility,
+                  )
+                : null,
           ),
         ),
         const SizedBox(height: 15),

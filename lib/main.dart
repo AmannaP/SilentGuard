@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'services/notification_service.dart';
 import 'screens/profile.dart';
 import 'screens/landing_page.dart';
 import 'screens/login_page.dart';
@@ -11,13 +12,16 @@ import 'screens/archive_screen.dart';
 import 'screens/upload_evidence_screen.dart';
 import 'screens/record_evidence_screen.dart';
 import 'screens/call_screen.dart';
+import 'screens/contacts_screen.dart';
+import 'screens/chat_provider_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
+    await NotificationService().init();
   } catch (e) {
-    debugPrint("Firebase initialization failed: $e");
+    debugPrint("Initialization failed: $e");
   }
   runApp(const SilentGuardApp());
 }
@@ -48,6 +52,11 @@ class SilentGuardApp extends StatelessWidget {
         '/call_screen': (context) => const CallScreen(),
         '/upload_evidence_screen': (context) => const UploadEvidenceScreen(),
         '/record_evidence_screen': (context) => const RecordEvidenceScreen(),
+        '/contacts_screen': (context) => const ContactsScreen(),
+        '/chat_provider': (context) {
+           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+           return ChatProviderScreen(providerData: args);
+        },
       },
     );
   }

@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:image_picker/image_picker.dart';
+import '../services/case_history.dart';
+import '../services/archive_service.dart';
 
 class RecordEvidenceScreen extends StatefulWidget {
   const RecordEvidenceScreen({super.key});
@@ -12,7 +16,10 @@ class RecordEvidenceScreen extends StatefulWidget {
 class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
   late final AudioRecorder _audioRecorder;
   bool _isRecording = false;
+  bool _isUploading = false;
   String? _recordedFilePath;
+  final CaseService _caseService = CaseService();
+  final ArchiveService _archiveService = ArchiveService();
 
   @override
   void initState() {
@@ -65,16 +72,86 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
         });
         
         if (path != null) {
-          // Show success message and navigate back or offer playback/upload
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Audio recorded successfully and saved to vault!')),
-          );
-          // Return the file path to the previous screen if needed
-          Navigator.pop(context, path);
+          setState(() => _isUploading = true);
+
+          try {
+            File file = File(path);
+            String fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
+            String downloadUrl = await _caseService.uploadEvidence(file, fileName);
+            
+            if (downloadUrl.isNotEmpty) {
+              await _archiveService.saveEvidence(fileName, 'audio', downloadUrl);
+              
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Audio recorded successfully and saved to vault!')),
+                );
+                Navigator.pop(context, path);
+              }
+            } else {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Verification Failed: Could not acquire URL')),
+                );
+              }
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Upload Error: $e')),
+              );
+            }
+          } finally {
+            if (mounted) setState(() => _isUploading = false);
+          }
         }
       }
     } catch (e) {
       debugPrint("Error stopping record: $e");
+    }
+  }
+
+  Future<void> _recordVideo() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? video = await picker.pickVideo(source: ImageSource.camera);
+      if (video != null) {
+         setState(() => _isUploading = true);
+         try {
+            File file = File(video.path);
+            String fileName = 'video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+
+            String downloadUrl = await _caseService.uploadEvidence(file, fileName);
+            
+            if (downloadUrl.isNotEmpty) {
+              await _archiveService.saveEvidence(fileName, 'video', downloadUrl);
+              
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Video recorded securely and saved to vault!')),
+                );
+                Navigator.pop(context, video.path);
+              }
+            } else {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Verification Failed: Could not acquire URL')),
+                );
+              }
+            }
+         } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Upload Error: $e')),
+              );
+            }
+         } finally {
+            if (mounted) setState(() => _isUploading = false);
+         }
+      }
+    } catch (e) {
+      debugPrint("Error recording video: $e");
     }
   }
 
@@ -83,11 +160,11 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Record Evidence', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: const Text('Record Evidence', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFFCD7F32), // Bronze Theme
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -104,13 +181,13 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
                 height: 150,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _isRecording ? Colors.red : Colors.red.withOpacity(0.1),
-                  border: Border.all(color: Colors.red.withOpacity(0.3), width: 4),
+                  color: _isRecording ? Colors.red : const Color(0xFFCD7F32).withOpacity(0.1),
+                  border: Border.all(color: _isRecording ? Colors.red : const Color(0xFFCD7F32).withOpacity(0.3), width: 4),
                 ),
                 child: Icon(
                   _isRecording ? Icons.stop : Icons.mic,
                   size: 80,
-                  color: _isRecording ? Colors.white : Colors.red,
+                  color: _isRecording ? Colors.white : const Color(0xFFCD7F32),
                 ),
               ),
             ),
@@ -125,28 +202,27 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
-            const Spacer(flex: 2),
+            const SizedBox(height: 32),
+            if (_isUploading) const Center(child: CircularProgressIndicator(color: Color(0xFFCD7F32))),
+            if (_isUploading) const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Video recording not implemented yet!')),
-                  );
-                },
+                onPressed: _recordVideo,
                 icon: const Icon(Icons.videocam_outlined),
-                label: const Text('Switch to Video Recording'),
+                label: const Text('Switch to Video Recording', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade100,
-                  foregroundColor: Colors.black87,
-                  elevation: 0,
+                  backgroundColor: const Color(0xFFCD7F32),
+                  foregroundColor: Colors.white,
+                  elevation: 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
             ),
+            const Spacer(flex: 2),
           ],
         ),
       ),

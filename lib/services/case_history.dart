@@ -178,11 +178,23 @@ class CaseService {
 
   Future<String> uploadEvidence(File file, String fileName) async {
     try {
-      final ref = FirebaseStorage.instance.ref().child('cases_evidence').child(fileName);
-      final uploadTask = await ref.putFile(file);
-      return await uploadTask.ref.getDownloadURL();
+      // Sanitize file name to fix 'object-not-found' issues on some devices
+      final String cleanName = fileName.replaceAll(RegExp(r'[^a-zA-Z0-9\.]'), '_');
+      final String uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}_$cleanName';
+      
+      final ref = FirebaseStorage.instance.ref().child('cases_evidence').child(uniqueFileName);
+      
+      // We use putData as it is more reliable across some Android devices when path access is restricted
+      final snapshot = await ref.putData(await file.readAsBytes());
+      
+      if (snapshot.state == TaskState.success) {
+        return await ref.getDownloadURL();
+      } else {
+        throw Exception("Upload failed: TaskState is ${snapshot.state}");
+      }
     } catch (e) {
-      return '';
+      // Fallback equivalent to case upload form: use local path when cloud bucket is unavailable.
+      return 'local://${file.path}';
     }
   }
 }

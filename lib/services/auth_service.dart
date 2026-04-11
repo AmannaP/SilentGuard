@@ -61,4 +61,13 @@ class AuthService {
   Future<DocumentSnapshot> getUserData(String uid) {
     return _firestore.collection('users').doc(uid).get();
   }
+
+  // Reset Password
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

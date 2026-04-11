@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import '../services/case_history.dart';
+import '../utils/ui_utils.dart';
 import 'call_screen.dart';
 
 // ─────────────────────────────────────────────
@@ -17,10 +20,12 @@ class CaseChatScreen extends StatefulWidget {
 
 class _CaseChatScreenState extends State<CaseChatScreen> {
   final TextEditingController _messageController = TextEditingController();
+  final CaseService _caseService = CaseService();
+  bool _isUploading = false;
 
-  void _sendMessage() async {
-    final text = _messageController.text.trim();
-    if (text.isEmpty || widget.caseModel.id == null) return;
+  void _sendMessage({String text = '', String imageUrl = ''}) async {
+    if (text.isEmpty && imageUrl.isEmpty) return;
+    if (widget.caseModel.id == null) return;
     
     _messageController.clear();
     FocusScope.of(context).unfocus(); // optional
@@ -32,12 +37,40 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
           .collection('messages')
           .add({
         'text': text,
+        'imageUrl': imageUrl,
         // Assuming 'isMe' is true since the user is sending from this device
         'isMe': true,
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       debugPrint("Failed to send message: $e");
+    }
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    try {
+      FilePickerResult? result = await FilePicker.pickFiles(
+        type: FileType.image,
+      );
+
+      if (result != null && result.files.single.path != null) {
+        if (!mounted) return;
+        setState(() => _isUploading = true);
+
+        File file = File(result.files.single.path!);
+        String fileName = 'case_${DateTime.now().millisecondsSinceEpoch}_${result.files.single.name}';
+        
+        String downloadUrl = await _caseService.uploadEvidence(file, fileName);
+        if (downloadUrl.isNotEmpty) {
+          _sendMessage(imageUrl: downloadUrl);
+        } else {
+          if (mounted) UIUtils.showCustomPopup(context, title: 'Upload Failed', message: 'Could not upload image.', isSuccess: false);
+        }
+      }
+    } catch (e) {
+      if (mounted) UIUtils.showCustomPopup(context, title: 'Storage Error', message: e.toString(), isSuccess: false);
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
@@ -108,6 +141,7 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
 
                         return _MessageBubble(
                           text: text,
+                          imageUrl: data['imageUrl'] ?? '',
                           isMe: isMe,
                           time: timeStr,
                         );
@@ -117,10 +151,13 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
               ),
           ),
 
+          if (_isUploading) const LinearProgressIndicator(color: Color(0xFFCD7F32)),
+
           // ── Input Bar ──
           _MessageInputBar(
             controller: _messageController,
-            onSend: _sendMessage,
+            onSend: () => _sendMessage(text: _messageController.text.trim()),
+            onPickImage: _pickAndUploadImage,
             onCallTap: () {
               Navigator.push(
                 context,
@@ -228,11 +265,13 @@ class _IncidentCard extends StatelessWidget {
 
 class _MessageBubble extends StatelessWidget {
   final String text;
+  final String imageUrl;
   final bool isMe;
   final String time;
 
   const _MessageBubble({
     required this.text,
+    this.imageUrl = '',
     required this.isMe,
     required this.time,
   });
@@ -268,10 +307,21 @@ class _MessageBubble extends StatelessWidget {
               ? CrossAxisAlignment.end
               : CrossAxisAlignment.start,
           children: [
-            Text(
-              text,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
-            ),
+            if (imageUrl.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: imageUrl.startsWith('local://') 
+                    ? Image.file(File(imageUrl.replaceFirst('local://', '')), height: 150, width: double.infinity, fit: BoxFit.cover)
+                    : Image.network(imageUrl, height: 150, width: double.infinity, fit: BoxFit.cover),
+                ),
+              ),
+            if (text.isNotEmpty)
+              Text(
+                text,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+              ),
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -282,7 +332,7 @@ class _MessageBubble extends StatelessWidget {
                 ),
                 if (isMe) ...[
                   const SizedBox(width: 4),
-                  Icon(Icons.done_all, size: 12, color: Colors.blue.shade400),
+                  const Icon(Icons.done, size: 12, color: Colors.grey),
                 ],
               ],
             ),
@@ -296,11 +346,13 @@ class _MessageBubble extends StatelessWidget {
 class _MessageInputBar extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
+  final VoidCallback onPickImage;
   final VoidCallback onCallTap;
 
   const _MessageInputBar({
     required this.controller,
     required this.onSend,
+    required this.onPickImage,
     required this.onCallTap,
   });
 
@@ -370,11 +422,11 @@ class _MessageInputBar extends StatelessWidget {
                     Icons.camera_alt_outlined,
                     color: Colors.grey,
                   ),
-                  onPressed: () {},
+                  onPressed: onPickImage,
                 ),
                 IconButton(
                   icon: const Icon(Icons.image_outlined, color: Colors.grey),
-                  onPressed: () {},
+                  onPressed: onPickImage,
                 ),
                 Expanded(
                   child: Container(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../utils/ui_utils.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final Color _themeOrange = const Color(0xFFD4833B);
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +62,51 @@ class _LoginPageState extends State<LoginPage> {
                 isPassword: true,
               ),
 
-              const SizedBox(height: 40),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () async {
+                    if (_emailController.text.trim().isEmpty) {
+                      UIUtils.showCustomPopup(
+                        context,
+                        title: 'Email Required',
+                        message: 'Please enter your email address in the field above to reset your password.',
+                        isSuccess: false,
+                      );
+                      return;
+                    }
+                    setState(() => _isLoading = true);
+                    try {
+                      await AuthService().resetPassword(_emailController.text.trim());
+                      if (mounted) {
+                        UIUtils.showCustomPopup(
+                          context,
+                          title: 'Email Sent',
+                          message: 'A password reset link has been sent to ${_emailController.text.trim()}.',
+                          isSuccess: true,
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        UIUtils.showCustomPopup(
+                          context,
+                          title: 'Error',
+                          message: e.toString(),
+                          isSuccess: false,
+                        );
+                      }
+                    } finally {
+                      if (mounted) setState(() => _isLoading = false);
+                    }
+                  },
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(color: Colors.white70, decoration: TextDecoration.underline),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
 
               // Login Button (Matches Figma text style)
               Align(
@@ -68,7 +114,12 @@ class _LoginPageState extends State<LoginPage> {
                 child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : TextButton(
                   onPressed: () async {
                     if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+                      UIUtils.showCustomPopup(
+                        context,
+                        title: 'Fields Required',
+                        message: 'Please fill out both email and password fields.',
+                        isSuccess: false,
+                      );
                       return;
                     }
                     setState(() => _isLoading = true);
@@ -79,7 +130,12 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     } catch (e) {
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login Failed: $e')));
+                        UIUtils.showCustomPopup(
+                          context,
+                          title: 'Login Failed',
+                          message: e.toString(),
+                          isSuccess: false,
+                        );
                       }
                     } finally {
                       if (mounted) setState(() => _isLoading = false);
@@ -130,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 8),
         TextField(
           controller: controller,
-          obscureText: isPassword,
+          obscureText: isPassword && !_isPasswordVisible,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
@@ -142,6 +198,19 @@ class _LoginPageState extends State<LoginPage> {
               vertical: 15,
               horizontal: 20,
             ),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  )
+                : null,
           ),
         ),
         const SizedBox(height: 20),

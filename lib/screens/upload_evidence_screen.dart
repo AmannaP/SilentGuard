@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/case_history.dart';
 import '../services/archive_service.dart';
+import '../utils/ui_utils.dart';
 
 class UploadEvidenceScreen extends StatefulWidget {
   const UploadEvidenceScreen({super.key});
@@ -44,12 +45,18 @@ class _UploadEvidenceScreenState extends State<UploadEvidenceScreen> {
           });
 
           if (downloadUrl.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Evidence uploaded successfully to vault!')),
+            UIUtils.showCustomPopup(
+              context,
+              title: 'Upload Complete',
+              message: 'Evidence securely attached to your vault!',
+              isSuccess: true,
             );
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to upload evidence.')),
+            UIUtils.showCustomPopup(
+              context,
+              title: 'Upload Invalid',
+              message: 'Cloud storage returned an empty file path. The upload process was interrupted.',
+              isSuccess: false,
             );
           }
         }
@@ -59,8 +66,11 @@ class _UploadEvidenceScreenState extends State<UploadEvidenceScreen> {
         setState(() {
           _isUploading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+        UIUtils.showCustomPopup(
+          context,
+          title: 'Storage Error',
+          message: e.toString(),
+          isSuccess: false,
         );
       }
     }

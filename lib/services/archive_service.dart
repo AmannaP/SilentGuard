@@ -48,9 +48,8 @@ class ArchiveService {
     if (uid == null) return Stream.value([]);
     return _archive
         .where('userId', isEqualTo: uid)
-        .orderBy('created_at', descending: true)
         .snapshots()
-        .map((snap) => snap.docs.map((d) => ArchiveEvidence.fromDoc(d)).toList());
+        .map((snap) => snap.docs.map((d) => ArchiveEvidence.fromDoc(d)).toList().reversed.toList());
   }
 
   Future<void> saveEvidence(String title, String type, String downloadUrl) async {

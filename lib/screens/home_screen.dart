@@ -276,6 +276,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 15),
                     _buildActionItem(
+                      Icons.chat,
+                      "Message Someone",
+                      Colors.orange.shade100,
+                      onTap: () => Navigator.pushNamed(context, '/contacts_screen'),
+                    ),
+                    _buildActionItem(
                       Icons.medical_services,
                       "Upload Evidence",
                       Colors.green.shade100,

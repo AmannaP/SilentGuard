@@ -132,9 +132,9 @@ class LandingPage extends StatelessWidget {
                       ],
                     ),
                     child: ElevatedButton(
-                      onPressed: () {
                         // Logic for quick emergency report
-                      },
+                        onPressed: () =>
+                          Navigator.pushNamed(context, '/map_tracking_screen'),                              
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(

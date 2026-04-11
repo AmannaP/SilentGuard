@@ -6,7 +6,12 @@ import '../services/archive_service.dart';
 class ArchiveScreen extends StatelessWidget {
   const ArchiveScreen({super.key});
 
-  void _launchUrl(String url) async {
+  void _launchUrl(BuildContext context, String url) async {
+    if (url.startsWith('local://')) {
+       final path = url.replaceFirst('local://', '');
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('File is stored securely on device at: $path')));
+       return;
+    }
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -66,7 +71,7 @@ class ArchiveScreen extends StatelessWidget {
                   subtitle: Text('Uploaded: ${evidence.timestamp}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.download_rounded, color: Color(0xFFCD7F32)),
-                    onPressed: () => _launchUrl(evidence.downloadUrl),
+                    onPressed: () => _launchUrl(context, evidence.downloadUrl),
                   ),
                 ),
               );
