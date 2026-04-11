@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/auth_service.dart';
 import '../services/case_history.dart';
 import '../services/notification_service.dart';
@@ -54,18 +54,19 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
     }
   }
 
-  Future<void> _pickAndUploadImage() async {
+  Future<void> _pickAndUploadImage({required bool fromCamera}) async {
     try {
-      FilePickerResult? result = await FilePicker.pickFiles(
-        type: FileType.image,
+      final picker = ImagePicker();
+      final XFile? xFile = await picker.pickImage(
+        source: fromCamera ? ImageSource.camera : ImageSource.gallery,
       );
 
-      if (result != null && result.files.single.path != null) {
+      if (xFile != null) {
         if (!mounted) return;
         setState(() => _isUploading = true);
 
-        File file = File(result.files.single.path!);
-        String fileName = 'chat_${DateTime.now().millisecondsSinceEpoch}_${result.files.single.name}';
+        File file = File(xFile.path);
+        String fileName = 'chat_${DateTime.now().millisecondsSinceEpoch}_${xFile.name}';
         
         String downloadUrl = await _caseService.uploadEvidence(file, fileName);
         if (downloadUrl.isNotEmpty) {
@@ -172,7 +173,8 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
           _MessageInputBar(
             controller: _messageController,
             onSend: () => _sendMessage(text: _messageController.text.trim()),
-            onPickImage: _pickAndUploadImage,
+            onPickImage: () => _pickAndUploadImage(fromCamera: false),
+            onCaptureImage: () => _pickAndUploadImage(fromCamera: true),
             onCallTap: () {
               Navigator.pushNamed(context, '/call_screen');
             },
@@ -245,9 +247,10 @@ class _MessageInputBar extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;
   final VoidCallback onPickImage;
+  final VoidCallback onCaptureImage;
   final VoidCallback onCallTap;
 
-  const _MessageInputBar({required this.controller, required this.onSend, required this.onPickImage, required this.onCallTap});
+  const _MessageInputBar({required this.controller, required this.onSend, required this.onPickImage, required this.onCaptureImage, required this.onCallTap});
 
   @override
   Widget build(BuildContext context) {
@@ -284,7 +287,7 @@ class _MessageInputBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
-                IconButton(icon: const Icon(Icons.camera_alt_outlined, color: Colors.grey), onPressed: onPickImage),
+                IconButton(icon: const Icon(Icons.camera_alt_outlined, color: Colors.grey), onPressed: onCaptureImage),
                 IconButton(icon: const Icon(Icons.image_outlined, color: Colors.grey), onPressed: onPickImage),
                 Expanded(
                   child: Container(

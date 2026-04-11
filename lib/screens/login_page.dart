@@ -124,9 +124,16 @@ class _LoginPageState extends State<LoginPage> {
                     }
                     setState(() => _isLoading = true);
                     try {
-                      await AuthService().login(_emailController.text.trim(), _passwordController.text.trim());
-                      if (mounted) {
-                        Navigator.pushReplacementNamed(context, '/home_page');
+                      final cred = await AuthService().login(_emailController.text.trim(), _passwordController.text.trim());
+                      if (cred?.user != null && mounted) {
+                        final role = await AuthService().getUserRole(cred!.user!.uid);
+                        if (mounted) {
+                          if (role == 'rep') {
+                            Navigator.pushReplacementNamed(context, '/rep_dashboard');
+                          } else {
+                            Navigator.pushReplacementNamed(context, '/home_page');
+                          }
+                        }
                       }
                     } catch (e) {
                       if (mounted) {

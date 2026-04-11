@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/auth_service.dart';
+import '../utils/ui_utils.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -13,6 +17,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final Color _themeOrange = const Color(0xFFD4833B);
   String _fullName = "Loading...";
   String _email = "Loading...";
+  String _photoUrl = "";
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -31,14 +37,71 @@ class _ProfilePageState extends State<ProfilePage> {
               setState(() {
                  _fullName = data['fullName'] ?? 'Unknown User';
                  _email = data['email'] ?? 'Unknown Email';
+                 _photoUrl = data['photoUrl'] ?? '';
               });
             }
          }
        } catch (e) {
-         // Silently handle error
+         debugPrint("Profile load error: $e");
        }
     }
   }
+
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    
+    if (image == null) return;
+
+    setState(() => _isUploading = true);
+    final uid = AuthService().currentUser?.uid;
+    if (uid == null) return;
+
+    try {
+      final ref = FirebaseStorage.instance.ref().child('profile_pics').child('$uid.jpg');
+      await ref.putFile(File(image.path));
+      final url = await ref.getDownloadURL();
+      
+      await AuthService().updateUserData(uid, {'photoUrl': url});
+      setState(() => _photoUrl = url);
+      
+      if (mounted) {
+        UIUtils.showCustomPopup(context, title: 'Success', message: 'Profile picture updated!', isSuccess: true);
+      }
+    } catch (e) {
+      if (mounted) {
+        UIUtils.showCustomPopup(context, title: 'Upload Failed', message: e.toString(), isSuccess: false);
+      }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
+
+  void _showEditDialog(String title, String field, String currentValue) {
+    final controller = TextEditingController(text: currentValue);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit $title'),
+        content: TextField(controller: controller, decoration: InputDecoration(hintText: 'Enter $title')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              final uid = AuthService().currentUser?.uid;
+              if (uid != null) {
+                await AuthService().updateUserData(uid, {field: controller.text.trim()});
+                _loadUserData();
+              }
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +121,20 @@ class _ProfilePageState extends State<ProfilePage> {
             decoration: BoxDecoration(color: _themeOrange),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 35,
-                  backgroundImage: AssetImage(
-                    'assets/profile_image.png',
-                  ), // Replace with your image
+                GestureDetector(
+                  onTap: _pickAndUploadImage,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.white24,
+                        backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                        child: _photoUrl.isEmpty ? const Icon(Icons.person, size: 40, color: Colors.white54) : null,
+                      ),
+                      if (_isUploading) const CircularProgressIndicator(color: Colors.white),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 15),
                 Expanded(
@@ -85,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () => _showEditDialog('Name', 'fullName', _fullName),
                   icon: const Icon(Icons.edit_outlined, color: Colors.white),
                 ),
               ],
@@ -102,6 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Icons.person_outline,
                     "My Account",
                     sub: "Make changes to your account",
+                    onTap: () => _showEditDialog('Name', 'fullName', _fullName),
                     trailing: const Icon(
                       Icons.warning_amber_rounded,
                       color: Colors.red,

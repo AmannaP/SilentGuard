@@ -247,6 +247,20 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
                     ),
                   ),
                   
+                  const SizedBox(height: 10),
+                  // Simulation Button for testing
+                  if (requestId != null && helperLatLng == null)
+                    TextButton(
+                      onPressed: () async {
+                        await FirebaseFirestore.instance.collection('tracking').doc(requestId).update({
+                          'status': 'help_on_the_way',
+                          'helper': {'lat': 5.7600, 'lng': -0.2200},
+                          'eta': '2 mins away',
+                        });
+                      },
+                      child: const Text('Simulate Helper Response', style: TextStyle(color: Colors.white70, decoration: TextDecoration.underline)),
+                    ),
+                  
                   const SizedBox(height: 15),
                   const Divider(color: Colors.white),
                   const SizedBox(height: 15),

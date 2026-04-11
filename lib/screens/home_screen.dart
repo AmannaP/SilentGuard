@@ -139,9 +139,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  const Icon(Icons.camera_alt_outlined, size: 28),
-                  const SizedBox(width: 15),
-                  const Icon(Icons.notifications_none_outlined, size: 28),
+                  IconButton(
+                    icon: const Icon(Icons.camera_alt_outlined, size: 28),
+                    onPressed: () => Navigator.pushNamed(context, '/record_evidence_screen'),
+                  ),
+                  const SizedBox(width: 5),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none_outlined, size: 28),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('No new notifications')),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:open_filex/open_filex.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/archive_service.dart';
 
@@ -9,7 +10,16 @@ class ArchiveScreen extends StatelessWidget {
   void _launchUrl(BuildContext context, String url) async {
     if (url.startsWith('local://')) {
        final path = url.replaceFirst('local://', '');
-       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('File is stored securely on device at: $path')));
+       try {
+         final result = await OpenFilex.open(path);
+         if (result.type != ResultType.done && context.mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Could not open file: ${result.message}')));
+         }
+       } catch (e) {
+         if (context.mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error opening file: $e')));
+         }
+       }
        return;
     }
     final uri = Uri.parse(url);

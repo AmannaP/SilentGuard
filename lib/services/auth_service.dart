@@ -31,6 +31,7 @@ class AuthService {
           'fullName': fullName,
           'email': email,
           'phoneNumber': phoneNumber,
+          'role': 'victim',
           'createdAt': FieldValue.serverTimestamp(),
         });
       }
@@ -57,9 +58,24 @@ class AuthService {
     await _auth.signOut();
   }
 
+  // Update user data
+  Future<void> updateUserData(String uid, Map<String, dynamic> data) async {
+    await _firestore.collection('users').doc(uid).update(data);
+  }
+
   // Get User Data from Firestore
   Future<DocumentSnapshot> getUserData(String uid) {
     return _firestore.collection('users').doc(uid).get();
+  }
+
+  // Get user role
+  Future<String> getUserRole(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      return data['role'] ?? 'victim';
+    }
+    return 'victim';
   }
 
   // Reset Password
