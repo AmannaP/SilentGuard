@@ -11,7 +11,6 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
   bool _isLoading = false;
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
@@ -94,7 +93,6 @@ class _SignUpPageState extends State<SignUpPage> {
               child: PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (int page) => setState(() => _currentPage = page),
                 children: [_buildPageOne(), _buildPageTwo()],
               ),
             ),

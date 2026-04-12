@@ -17,7 +17,6 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
   late final AudioRecorder _audioRecorder;
   bool _isRecording = false;
   bool _isUploading = false;
-  String? _recordedFilePath;
   final CaseService _caseService = CaseService();
   final ArchiveService _archiveService = ArchiveService();
 
@@ -47,7 +46,6 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
         if (mounted) {
           setState(() {
             _isRecording = true;
-            _recordedFilePath = path;
           });
         }
       } else {
@@ -68,7 +66,6 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
       if (mounted) {
         setState(() {
           _isRecording = false;
-          _recordedFilePath = path;
         });
         
         if (path != null) {
