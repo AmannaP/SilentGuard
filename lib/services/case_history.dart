@@ -193,8 +193,8 @@ class CaseService {
         throw Exception("Upload failed: TaskState is ${snapshot.state}");
       }
     } catch (e) {
-      // Fallback equivalent to case upload form: use local path when cloud bucket is unavailable.
-      return 'local://${file.path}';
+      debugPrint("Firebase Storage Upload Error: $e");
+      rethrow;
     }
   }
 }

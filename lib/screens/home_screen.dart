@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/tracking_service.dart';
+import '../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,11 +18,37 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentAddress = "Locating...";
   Position? _currentPosition;
   bool _isTriggering = false;
+  String? _activeRequestId;
+  String _userName = "User";
 
   @override
   void initState() {
     super.initState();
     _initLocation();
+    _checkActiveSOS();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    final user = AuthService().currentUser;
+    if (user != null) {
+      final doc = await AuthService().getUserData(user.uid);
+      if (doc.exists && mounted) {
+        setState(() {
+          _userName = (doc.data() as Map<String, dynamic>)['fullName'] ?? 'User';
+        });
+      }
+    }
+  }
+
+  Future<void> _checkActiveSOS() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedId = prefs.getString('active_sos_id');
+    if (mounted) {
+      setState(() {
+        _activeRequestId = savedId;
+      });
+    }
   }
 
   Future<void> _initLocation() async {
@@ -65,15 +93,23 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       debugPrint("Triggering SOS API in Firestore...");
-      final requestId = await _trackingService.triggerSOS(_currentPosition!);
+      final requestId = await _trackingService.triggerSOS(
+        _currentPosition!, 
+        userName: _userName,
+      );
       debugPrint("SOS Triggered! Request ID: $requestId");
 
+      // Save to persistence
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('active_sos_id', requestId);
+
       if (mounted) {
+        setState(() => _activeRequestId = requestId);
         Navigator.pushNamed(
           context,
           '/map_tracking',
           arguments: requestId,
-        );
+        ).then((_) => _checkActiveSOS()); // Re-check when coming back
       }
     } catch (e) {
       debugPrint("SOS Trigger Error: $e");
@@ -99,14 +135,24 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                  if (_activeRequestId != null)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/map_tracking',
+                          arguments: _activeRequestId,
+                        ).then((_) => _checkActiveSOS());
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(Icons.bolt, color: _themeOrange, size: 28),
+                      ),
                     ),
-                    child: Icon(Icons.bolt, color: _themeOrange, size: 28),
-                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(

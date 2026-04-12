@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/case_history.dart';
 import '../services/notification_service.dart';
 import '../utils/ui_utils.dart';
+import '../widgets/chat_widgets.dart';
 
 class ChatProviderScreen extends StatefulWidget {
   final Map<String, dynamic> providerData;
@@ -158,11 +159,13 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
                       timeStr = '${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}';
                     }
 
-                    return _MessageBubble(
-                      text: data['text'] ?? '',
-                      imageUrl: data['imageUrl'] ?? '',
-                      isMe: isMe,
-                      time: timeStr,
+                    return UnifiedMessageBubble(
+                      message: ChatMessage(
+                        text: data['text'] ?? '',
+                        imageUrl: data['imageUrl'] ?? '',
+                        isMe: isMe,
+                        time: timeStr,
+                      ),
                     );
                   },
                 );
@@ -170,8 +173,9 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
             ),
           ),
           if (_isUploading) const LinearProgressIndicator(color: Color(0xFFCD7F32)),
-          _MessageInputBar(
+          UnifiedChatInputBar(
             controller: _messageController,
+            isUploading: _isUploading,
             onSend: () => _sendMessage(text: _messageController.text.trim()),
             onPickImage: () => _pickAndUploadImage(fromCamera: false),
             onCaptureImage: () => _pickAndUploadImage(fromCamera: true),
@@ -185,128 +189,5 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
   }
 }
 
-class _MessageBubble extends StatelessWidget {
-  final String text;
-  final String imageUrl;
-  final bool isMe;
-  final String time;
+// Removed internal _MessageBubble and _MessageInputBar as they are now in chat_widgets.dart
 
-  const _MessageBubble({required this.text, this.imageUrl = '', required this.isMe, required this.time});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.70),
-        decoration: BoxDecoration(
-          color: isMe ? const Color(0xFFCD7F32).withOpacity(0.2) : Colors.grey.shade200,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isMe ? 16 : 4),
-            bottomRight: Radius.circular(isMe ? 4 : 16),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-          children: [
-            if (imageUrl.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: imageUrl.startsWith('local://') 
-                    ? Image.file(File(imageUrl.replaceFirst('local://', '')), height: 150, width: double.infinity, fit: BoxFit.cover)
-                    : Image.network(imageUrl, height: 150, width: double.infinity, fit: BoxFit.cover),
-                ),
-              ),
-            if (text.isNotEmpty)
-              Text(text, style: const TextStyle(fontSize: 14, color: Colors.black87)),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(time, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-                if (isMe) ...[
-                  const SizedBox(width: 4),
-                  const Icon(Icons.done, size: 14, color: Colors.grey),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MessageInputBar extends StatelessWidget {
-  final TextEditingController controller;
-  final VoidCallback onSend;
-  final VoidCallback onPickImage;
-  final VoidCallback onCaptureImage;
-  final VoidCallback onCallTap;
-
-  const _MessageInputBar({required this.controller, required this.onSend, required this.onPickImage, required this.onCaptureImage, required this.onCallTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16, bottom: 8),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: onCallTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))],
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(radius: 14, backgroundColor: Color(0xFFCD7F32), child: Icon(Icons.phone, size: 14, color: Colors.white)),
-                      SizedBox(width: 8),
-                      Text('Make a Call', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.grey.shade100,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                IconButton(icon: const Icon(Icons.camera_alt_outlined, color: Colors.grey), onPressed: onCaptureImage),
-                IconButton(icon: const Icon(Icons.image_outlined, color: Colors.grey), onPressed: onPickImage),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.grey.shade300)),
-                    child: TextField(
-                      controller: controller,
-                      style: const TextStyle(color: Colors.black87),
-                      decoration: const InputDecoration(hintText: 'Message', border: InputBorder.none, hintStyle: TextStyle(color: Colors.black38)),
-                      onSubmitted: (_) => onSend(),
-                    ),
-                  ),
-                ),
-                IconButton(icon: const Icon(Icons.send, color: Color(0xFFCD7F32)), onPressed: onSend),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

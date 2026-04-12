@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/case_history.dart'; 
@@ -296,11 +297,31 @@ class CaseDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // If we have an ID, stream live updates from Firestore so admin changes
+    // are reflected instantly. Otherwise fall back to the passed-in model.
+    if (caseModel.id != null) {
+      return StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('cases')
+            .doc(caseModel.id!)
+            .snapshots(),
+        builder: (context, snapshot) {
+          final live = snapshot.hasData && snapshot.data!.exists
+              ? CaseModel.fromDoc(snapshot.data!)
+              : caseModel;
+          return _buildScaffold(context, live);
+        },
+      );
+    }
+    return _buildScaffold(context, caseModel);
+  }
+
+  Widget _buildScaffold(BuildContext context, CaseModel c) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Case Details', style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFFCD7F32), // Bronze
+        backgroundColor: const Color(0xFFCD7F32),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -309,14 +330,9 @@ class CaseDetailsPage extends StatelessWidget {
         icon: const Icon(Icons.chat),
         label: const Text('Chat with Officer'),
         onPressed: () {
-          Navigator.pushNamed(
+          Navigator.push(
             context,
-            '/chat_provider',
-            arguments: {
-              'uid': caseModel.officer.isNotEmpty && caseModel.officer != 'Awaiting Assignment' ? caseModel.officer : 'renel_ghana_default',
-              'name': caseModel.officer.isNotEmpty && caseModel.officer != 'Awaiting Assignment' ? caseModel.officer : 'Renel Ghana (Default)',
-              'phone': 'N/A',
-            }
+            MaterialPageRoute(builder: (_) => CaseChatScreen(caseModel: c)),
           );
         },
       ),
@@ -325,45 +341,73 @@ class CaseDetailsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Status Banner ──
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: _statusColor(c.status).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: _statusColor(c.status).withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: _statusColor(c.status), size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Status: ${c.status.isEmpty ? "Open" : c.status}',
+                    style: TextStyle(
+                      color: _statusColor(c.status),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (c.officer.isNotEmpty && c.officer != 'Awaiting Assignment')
+                    Text('Officer: ${c.officer}',
+                        style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
             // Header Section
-            _buildSectionTitle('Case # ${caseModel.incidentNumber}'),
-            _buildDetailText('Status', '🟠 ${caseModel.status}'),
-            _buildDetailText('System Date', '${caseModel.date} • ${caseModel.time}'),
+            _buildSectionTitle('Case # ${c.incidentNumber}'),
+            _buildDetailText('System Date', '${c.date} • ${c.time}'),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
             // Section 1: Client Information
             _buildSectionTitle('Client Information'),
-            _buildDetailText('Full Name', caseModel.victimName),
-            _buildDetailText('Age / DOB', caseModel.victimDob),
-            _buildDetailText('Gender', caseModel.victimGender),
-            _buildDetailText('Contact Number', caseModel.victimPhone),
-            _buildDetailText('Address', caseModel.location),
+            _buildDetailText('Full Name', c.victimName),
+            _buildDetailText('Age / DOB', c.victimDob),
+            _buildDetailText('Gender', c.victimGender),
+            _buildDetailText('Contact Number', c.victimPhone),
+            _buildDetailText('Address', c.location),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
             // Section 2: Incident Details
             _buildSectionTitle('Incident Details'),
-            _buildDetailText('Type of GBV', caseModel.caseType),
-            _buildDetailText('Incident Date', caseModel.incidentDate),
+            _buildDetailText('Type of GBV', c.caseType),
+            _buildDetailText('Incident Date', c.incidentDate),
             const SizedBox(height: 8),
-            const Text('Description:', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey, fontSize: 16)),
+            const Text('Description:',
+                style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey, fontSize: 16)),
             const SizedBox(height: 4),
-            Text(
-              caseModel.description,
-              style: const TextStyle(fontSize: 16, height: 1.5, color: Colors.black87),
-            ),
+            Text(c.description,
+                style: const TextStyle(fontSize: 16, height: 1.5, color: Colors.black87)),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
             // Section 3: Immediate Needs
             _buildSectionTitle('Immediate Needs Request'),
-            if (caseModel.immediateNeeds.isEmpty) 
-               const Text('None selected.', style: TextStyle(color: Colors.grey)),
-            ...caseModel.immediateNeeds.map((n) => Padding(
+            if (c.immediateNeeds.isEmpty)
+              const Text('None selected.', style: TextStyle(color: Colors.grey)),
+            ...c.immediateNeeds.map((n) => Padding(
               padding: const EdgeInsets.only(bottom: 6.0),
               child: Row(
                 children: [
@@ -377,50 +421,100 @@ class CaseDetailsPage extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 16),
 
-            // Evidence Upload Section
-            _buildSectionTitle('Evidence (${caseModel.media.length})'),
-            if (caseModel.media.isEmpty) const Text('No evidence uploaded yet.', style: TextStyle(color: Colors.grey)),
-            ...caseModel.media.map((m) => InkWell(
-                  onTap: (m.type == 'image' && m.path.isNotEmpty) ? () => _viewImage(context, m.path) : null,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: Row(
-                      children: [
-                        (m.type == 'image' && m.path.isNotEmpty && File(m.path).existsSync())
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: Image.file(File(m.path), width: 44, height: 44, fit: BoxFit.cover),
-                            )
-                          : Container(
-                              width: 44, height: 44,
-                              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(6)),
-                              child: Icon(m.type == 'image' ? Icons.camera_alt : m.type == 'voice' ? Icons.mic : Icons.insert_drive_file, color: Colors.grey),
-                            ),
-                        const SizedBox(width: 12),
-                        Text('${m.label} • ${m.size}', style: const TextStyle(fontSize: 16)),
-                        if (m.type == 'image' && m.path.isNotEmpty)
-                          const Padding(
-                            padding: EdgeInsets.only(left: 8.0),
-                            child: Icon(Icons.open_in_new, size: 14, color: Colors.grey),
-                          )
-                      ],
-                    ),
-                  ),
-                )),
+            // Evidence
+            _buildSectionTitle('Evidence (${c.media.length})'),
+            if (c.media.isEmpty)
+              const Text('No evidence uploaded yet.', style: TextStyle(color: Colors.grey)),
+            ...c.media.map((m) => InkWell(
+              onTap: (m.type == 'image' && m.path.isNotEmpty) ? () => _viewImage(context, m.path) : null,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Row(
+                  children: [
+                    (m.type == 'image' && m.path.isNotEmpty && File(m.path).existsSync())
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.file(File(m.path), width: 44, height: 44, fit: BoxFit.cover),
+                        )
+                      : Container(
+                          width: 44, height: 44,
+                          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(6)),
+                          child: Icon(m.type == 'image' ? Icons.camera_alt : m.type == 'voice' ? Icons.mic : Icons.insert_drive_file, color: Colors.grey),
+                        ),
+                    const SizedBox(width: 12),
+                    Text('${m.label} • ${m.size}', style: const TextStyle(fontSize: 16)),
+                    if (m.type == 'image' && m.path.isNotEmpty)
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Icon(Icons.open_in_new, size: 14, color: Colors.grey),
+                      )
+                  ],
+                ),
+              ),
+            )),
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 16),
 
             // Section 4: System Assigned Information
             _buildSectionTitle('System Assigned Information'),
-            _buildDetailText('Case ID', caseModel.incidentNumber),
-            _buildDetailText('Priority Level', caseModel.priorityLevel),
-            _buildDetailText('Assigned Officer', caseModel.officer.isEmpty ? 'Awaiting Assignment' : caseModel.officer),
-            const SizedBox(height: 24),
+            _buildDetailText('Case ID', c.incidentNumber),
+            _buildDetailText('Priority Level', c.priorityLevel),
+            _buildDetailText('Assigned Officer',
+                c.officer.isEmpty ? 'Awaiting Assignment' : c.officer),
+
+            // Updates from admin
+            if (c.updates.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Divider(),
+              const SizedBox(height: 16),
+              _buildSectionTitle('Case Updates'),
+              ...c.updates.map((u) => Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCD7F32).withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFCD7F32).withOpacity(0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(u.author,
+                            style: const TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFCD7F32))),
+                        Text(u.date,
+                            style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(u.message, style: const TextStyle(fontSize: 14)),
+                  ],
+                ),
+              )),
+            ],
+            const SizedBox(height: 100), // room for FAB
           ],
         ),
       ),
     );
+  }
+
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'resolved':
+      case 'closed':
+        return Colors.green;
+      case 'in progress':
+        return Colors.blue;
+      case 'pending':
+        return Colors.orange;
+      default:
+        return Colors.redAccent;
+    }
   }
 
   Widget _buildSectionTitle(String title) {

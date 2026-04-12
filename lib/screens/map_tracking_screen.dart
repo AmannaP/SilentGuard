@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/tracking_service.dart';
 import '../services/case_history.dart';
 import 'call_screen.dart';
@@ -102,9 +103,15 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
     }
   }
 
-  void _showCompletionDialog(String status) {
+  void _showCompletionDialog(String status) async {
     _positionStream?.cancel();
     _requestSubscription?.cancel();
+
+    // Clear saved SOS ID
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('active_sos_id');
+    
+    if (!mounted) return;
     
     showDialog(
       context: context,
@@ -130,6 +137,8 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
   Future<void> _handleCancel() async {
     if (requestId != null) {
       await _trackingService.cancelSOS(requestId!);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('active_sos_id');
     }
     if (mounted) Navigator.pop(context);
   }

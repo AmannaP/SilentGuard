@@ -17,6 +17,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final Color _themeOrange = const Color(0xFFD4833B);
   String _fullName = "Loading...";
   String _email = "Loading...";
+  String _phoneNumber = "";
   String _photoUrl = "";
   bool _isUploading = false;
 
@@ -38,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
                  _fullName = data['fullName'] ?? 'Unknown User';
                  _email = data['email'] ?? 'Unknown Email';
                  _photoUrl = data['photoUrl'] ?? '';
+                 _phoneNumber = data['phoneNumber'] ?? '';
               });
             }
          }
@@ -183,8 +185,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   _buildMenuItem(
                     Icons.people_outline,
-                    "Emergency Contact",
-                    sub: "Manage your saved numbers",
+                    "Phone Number",
+                    sub: _phoneNumber.isEmpty ? "Add your phone number" : _phoneNumber,
+                    onTap: () => _showEditDialog('Phone Number', 'phoneNumber', _phoneNumber),
                   ),
                   _buildMenuItem(
                     Icons.lock_outline,

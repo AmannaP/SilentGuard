@@ -9,14 +9,16 @@ class TrackingService {
     return _firestore.collection('tracking').doc(requestId).snapshots();
   }
 
-  Future<String> triggerSOS(Position position) async {
+  Future<String> triggerSOS(Position position, {String? userName}) async {
     DocumentReference docRef = await _firestore.collection('tracking').add({
       'user': {
         'lat': position.latitude,
         'lng': position.longitude,
       },
+      'userName': userName ?? 'Anonymous User',
       'status': 'emergency',
       'timestamp': FieldValue.serverTimestamp(),
+      'displayDate': DateTime.now().toString().substring(0, 16), // "2024-04-12 12:05"
       'userId': 'demo_user',
     });
     return docRef.id;

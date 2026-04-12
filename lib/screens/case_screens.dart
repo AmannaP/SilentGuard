@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/case_history.dart';
 import '../utils/ui_utils.dart';
+import '../widgets/chat_widgets.dart';
 import 'call_screen.dart';
 
 // ─────────────────────────────────────────────
@@ -28,7 +29,7 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
     if (widget.caseModel.id == null) return;
     
     _messageController.clear();
-    FocusScope.of(context).unfocus(); // optional
+    FocusScope.of(context).unfocus();
 
     try {
       await FirebaseFirestore.instance
@@ -38,8 +39,10 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
           .add({
         'text': text,
         'imageUrl': imageUrl,
-        // Assuming 'isMe' is true since the user is sending from this device
-        'isMe': true,
+        // senderRole='victim' = user side; 'staff' = admin side
+        // isMe is resolved per-viewer: victim sees own messages on right
+        'senderRole': 'victim',
+        'isMe': true, // kept for legacy backward-compat
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
@@ -130,7 +133,10 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
                       itemBuilder: (context, index) {
                         final data = docs[index].data() as Map<String, dynamic>;
                         final text = data['text'] ?? '';
-                        final isMe = data['isMe'] ?? false;
+                        // senderRole-aware: victim sees own msgs on right,
+                        // staff messages appear on the left
+                        final senderRole = data['senderRole'] ?? 'victim';
+                        final isMe = senderRole == 'victim';
                         
                         // Parse timestamp
                         String timeStr = '';
@@ -139,11 +145,15 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
                           timeStr = '${ts.hour.toString().padLeft(2, '0')}:${ts.minute.toString().padLeft(2, '0')}';
                         }
 
-                        return _MessageBubble(
-                          text: text,
-                          imageUrl: data['imageUrl'] ?? '',
-                          isMe: isMe,
-                          time: timeStr,
+                        return UnifiedMessageBubble(
+                          message: ChatMessage(
+                            text: text,
+                            imageUrl: data['imageUrl'] ?? '',
+                            isMe: isMe,
+                            time: timeStr,
+                            senderLabel: isMe ? null : 'Renel Ghana Staff',
+                            caseTag: isMe ? null : widget.caseModel.incidentNumber,
+                          ),
                         );
                       },
                     );
@@ -154,8 +164,9 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
           if (_isUploading) const LinearProgressIndicator(color: Color(0xFFCD7F32)),
 
           // ── Input Bar ──
-          _MessageInputBar(
+          UnifiedChatInputBar(
             controller: _messageController,
+            isUploading: _isUploading,
             onSend: () => _sendMessage(text: _messageController.text.trim()),
             onPickImage: _pickAndUploadImage,
             onCallTap: () {
@@ -263,199 +274,5 @@ class _IncidentCard extends StatelessWidget {
   }
 }
 
-class _MessageBubble extends StatelessWidget {
-  final String text;
-  final String imageUrl;
-  final bool isMe;
-  final String time;
+// Removed internal _MessageBubble and _MessageInputBar as they are now in chat_widgets.dart
 
-  const _MessageBubble({
-    required this.text,
-    this.imageUrl = '',
-    required this.isMe,
-    required this.time,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.70,
-        ),
-        decoration: BoxDecoration(
-          color: isMe ? const Color(0xFFC8F0C0) : Colors.grey.shade100,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isMe ? 16 : 4),
-            bottomRight: Radius.circular(isMe ? 4 : 16),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: isMe
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
-          children: [
-            if (imageUrl.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: imageUrl.startsWith('local://') 
-                    ? Image.file(File(imageUrl.replaceFirst('local://', '')), height: 150, width: double.infinity, fit: BoxFit.cover)
-                    : Image.network(imageUrl, height: 150, width: double.infinity, fit: BoxFit.cover),
-                ),
-              ),
-            if (text.isNotEmpty)
-              Text(
-                text,
-                style: const TextStyle(fontSize: 14, color: Colors.black87),
-              ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  time,
-                  style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
-                ),
-                if (isMe) ...[
-                  const SizedBox(width: 4),
-                  const Icon(Icons.done, size: 12, color: Colors.grey),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MessageInputBar extends StatelessWidget {
-  final TextEditingController controller;
-  final VoidCallback onSend;
-  final VoidCallback onPickImage;
-  final VoidCallback onCallTap;
-
-  const _MessageInputBar({
-    required this.controller,
-    required this.onSend,
-    required this.onPickImage,
-    required this.onCallTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // "Make a Call" button row
-          Padding(
-            padding: const EdgeInsets.only(right: 16, bottom: 8),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: onCallTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Color(0xFFCD7F32), // Bronze
-                        child: Icon(
-                          Icons.phone,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Make a Call',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Text field bar
-          Container(
-            color: Colors.grey.shade100,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.camera_alt_outlined,
-                    color: Colors.grey,
-                  ),
-                  onPressed: onPickImage,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.image_outlined, color: Colors.grey),
-                  onPressed: onPickImage,
-                ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: TextField(
-                      controller: controller,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        hintText: 'Message',
-                        hintStyle: TextStyle(color: Colors.white54),
-                        border: InputBorder.none,
-                      ),
-                      onSubmitted: (_) => onSend(),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Color(0xFFCD7F32)),
-                  onPressed: onSend,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
