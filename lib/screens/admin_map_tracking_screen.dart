@@ -80,6 +80,18 @@ class _AdminMapTrackingScreenState extends State<AdminMapTrackingScreen> {
         .collection('tracking')
         .doc(widget.requestId)
         .update(updates);
+
+    // Try to notify the user if possible
+    try {
+      final doc = await FirebaseFirestore.instance.collection('tracking').doc(widget.requestId).get();
+      final data = doc.data() as Map<String, dynamic>?;
+      if (data != null && data['userId'] != null) {
+        await FirebaseFirestore.instance.collection('users').doc(data['userId']).set({
+          'hasUnreadNotifications': true,
+        }, SetOptions(merge: true));
+      }
+    } catch (_) {}
+
     setState(() => _isUpdating = false);
   }
 
@@ -96,6 +108,18 @@ class _AdminMapTrackingScreenState extends State<AdminMapTrackingScreen> {
       'helper': {'lat': helperLat, 'lng': helperLng},
       'eta': 'Help is on the way',
     });
+
+    // Try to notify the user if possible
+    try {
+      final doc = await FirebaseFirestore.instance.collection('tracking').doc(widget.requestId).get();
+      final data = doc.data() as Map<String, dynamic>?;
+      if (data != null && data['userId'] != null) {
+        await FirebaseFirestore.instance.collection('users').doc(data['userId']).set({
+          'hasUnreadNotifications': true,
+        }, SetOptions(merge: true));
+      }
+    } catch (_) {}
+
     setState(() => _isUpdating = false);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

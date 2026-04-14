@@ -132,9 +132,15 @@ class LandingPage extends StatelessWidget {
                       ],
                     ),
                     child: ElevatedButton(
-                        // Logic for quick emergency report
-                        onPressed: () =>
-                          Navigator.pushNamed(context, '/map_tracking_screen'),                              
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please log in to make a secure SOS report.'),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                        Navigator.pushNamed(context, '/login_page');
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(

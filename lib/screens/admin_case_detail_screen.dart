@@ -85,6 +85,16 @@ class _AdminCaseDetailScreenState extends State<AdminCaseDetailScreen> {
           .doc(widget.caseModel.id!)
           .update(updates);
 
+      // Trigger Global Notification Badge for Victim
+      if (widget.caseModel.userId != null) {
+         await FirebaseFirestore.instance
+             .collection('users')
+             .doc(widget.caseModel.userId!)
+             .set({
+               'hasUnreadNotifications': true,
+             }, SetOptions(merge: true));
+      }
+
       if (mounted) {
         _noteController.clear();
         ScaffoldMessenger.of(context).showSnackBar(

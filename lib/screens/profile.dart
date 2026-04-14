@@ -42,10 +42,15 @@ class _ProfilePageState extends State<ProfilePage> {
                  _phoneNumber = data['phoneNumber'] ?? '';
               });
             }
-         }
+          } else {
+             if (mounted) setState(() { _fullName = 'User not found'; _email = 'Check connection'; });
+          }
        } catch (e) {
          debugPrint("Profile load error: $e");
+         if (mounted) setState(() { _fullName = 'Profile Error'; _email = 'Network failure'; });
        }
+    } else {
+       if (mounted) setState(() { _fullName = 'Guest'; _email = 'Not signed in'; });
     }
   }
 
@@ -192,13 +197,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildMenuItem(
                     Icons.lock_outline,
                     "Face ID / Touch ID",
-                    sub: "Manage your device security",
-                    trailing: Switch(value: false, onChanged: (val) {}),
+                    sub: "Feature coming soon",
+                    trailing: Switch(value: false, onChanged: null), // Disabled
                   ),
                   _buildMenuItem(
                     Icons.verified_user_outlined,
                     "Two-Factor Authentication",
-                    sub: "Further secure your account for safety",
+                    sub: "Feature coming soon",
                   ),
                   _buildMenuItem(
                     Icons.logout,
@@ -226,11 +231,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 10),
 
                 _buildMenuContainer([
-                  _buildMenuItem(Icons.notifications_none, "Help & Support"),
                   _buildMenuItem(
-                    Icons.favorite_border,
+                    Icons.help_outline, 
+                    "Help & Support",
+                    onTap: () => Navigator.pushNamed(context, '/help_support'),
+                  ),
+                  _buildMenuItem(
+                    Icons.info_outline,
                     "About App",
                     isLast: true,
+                    onTap: () => Navigator.pushNamed(context, '/about_app'),
                   ),
                 ]),
               ],

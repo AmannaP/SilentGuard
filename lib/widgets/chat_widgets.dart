@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ChatMessage {
   final String text;
@@ -135,20 +136,17 @@ class UnifiedMessageBubble extends StatelessWidget {
         errorBuilder: (context, error, stackTrace) => _errorPlaceholder(),
       );
     }
-    return Image.network(
-      url,
+    return CachedNetworkImage(
+      imageUrl: url,
       height: 180,
       width: double.infinity,
       fit: BoxFit.cover,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          height: 180,
-          color: Colors.grey[200],
-          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-        );
-      },
-      errorBuilder: (context, error, stackTrace) => _errorPlaceholder(),
+      placeholder: (context, url) => Container(
+        height: 180,
+        color: Colors.grey[200],
+        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+      ),
+      errorWidget: (context, url, error) => _errorPlaceholder(),
     );
   }
 
@@ -192,7 +190,7 @@ class UnifiedChatInputBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (isUploading) const LinearProgressIndicator(color: Color(0xFFCD7F32), height: 2),
+        if (isUploading) const LinearProgressIndicator(color: Color(0xFFCD7F32), minHeight: 2),
         SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),

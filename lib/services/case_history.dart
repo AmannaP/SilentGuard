@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA MODELS
@@ -81,9 +83,9 @@ class CaseModel {
   final String description;
   final List<String> immediateNeeds;
 
-  // Attached files/history
   final List<CaseUpdate> updates;
   final List<CaseMedia> media;
+  final String? userId; // Owner of the case
 
   CaseModel({
     this.id,
@@ -104,6 +106,7 @@ class CaseModel {
     required this.immediateNeeds,
     this.updates = const [],
     this.media = const [],
+    this.userId,
   });
 
   factory CaseModel.fromDoc(DocumentSnapshot doc) {
@@ -131,6 +134,7 @@ class CaseModel {
       media: (m['media'] as List<dynamic>? ?? [])
           .map((x) => CaseMedia.fromMap(Map<String, dynamic>.from(x)))
           .toList(),
+      userId: m['userId'],
     );
   }
 
@@ -152,6 +156,7 @@ class CaseModel {
         'immediate_needs': immediateNeeds,
         'updates': updates.map((u) => u.toMap()).toList(),
         'media': media.map((x) => x.toMap()).toList(),
+        'userId': userId,
         'created_at': FieldValue.serverTimestamp(),
       };
 }
@@ -164,11 +169,33 @@ class CaseService {
   FirebaseFirestore get _firestore => FirebaseFirestore.instance;
   CollectionReference get _cases => _firestore.collection('cases');
 
-  Stream<List<CaseModel>> getCasesStream() {
-    return _cases
-        .orderBy('created_at', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map((d) => CaseModel.fromDoc(d)).toList());
+  Stream<List<CaseModel>> getCasesStream({String? userId}) {
+    Query query = _cases;
+    
+    if (userId != null) {
+      query = query.where('userId', isEqualTo: userId);
+    }
+    
+    return query.snapshots().map((snap) {
+      // Convert to a mutable list of document snapshots
+      final docs = snap.docs.toList();
+      
+      // Sort in-memory instead of using Firestore's orderBy to avoid indexing requirements
+      docs.sort((a, b) {
+        final dataA = a.data() as Map<String, dynamic>;
+        final dataB = b.data() as Map<String, dynamic>;
+        final Timestamp? tsA = dataA['created_at'] as Timestamp?;
+        final Timestamp? tsB = dataB['created_at'] as Timestamp?;
+        
+        // Handle potential null timestamps (for documents being written)
+        if (tsA == null) return -1; 
+        if (tsB == null) return 1;
+        
+        return tsB.compareTo(tsA); // Sort descending (most recent first)
+      });
+
+      return docs.map((d) => CaseModel.fromDoc(d)).toList();
+    });
   }
 
   Future<String> createCase(CaseModel newCase) async {
@@ -178,22 +205,70 @@ class CaseService {
 
   Future<String> uploadEvidence(File file, String fileName) async {
     try {
-      // Sanitize file name to fix 'object-not-found' issues on some devices
-      final String cleanName = fileName.replaceAll(RegExp(r'[^a-zA-Z0-9\.]'), '_');
+      // 1. Ensure a user is logged in — Storage rules often require auth
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('Not authenticated. Please log in and try again.');
+      
+      // 2. Force-refresh the auth token so it's not stale
+      await user.getIdToken(true);
+      
+      // 3. Sanitize the file name (remove special chars that break Cloud Storage paths)
+      final String ext = fileName.contains('.') ? fileName.split('.').last.toLowerCase() : '';
+      final String cleanName = fileName.replaceAll(RegExp(r'[^a-zA-Z0-9\\._-]'), '_');
       final String uniqueFileName = '${DateTime.now().millisecondsSinceEpoch}_$cleanName';
       
-      final ref = FirebaseStorage.instance.ref().child('cases_evidence').child(uniqueFileName);
+      // 4. Determine content type for proper Storage indexing
+      final Map<String, String> contentTypeMap = {
+        'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png',
+        'gif': 'image/gif', 'webp': 'image/webp',
+        'mp4': 'video/mp4', 'mov': 'video/quicktime', 'avi': 'video/x-msvideo',
+        'mp3': 'audio/mpeg', 'wav': 'audio/wav', 'm4a': 'audio/mp4',
+        'pdf': 'application/pdf', 'doc': 'application/msword',
+        'txt': 'text/plain', 'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      };
+      final String? contentType = contentTypeMap[ext];
       
-      // We use putData as it is more reliable across some Android devices when path access is restricted
-      final snapshot = await ref.putData(await file.readAsBytes());
+      debugPrint('Starting upload: $uniqueFileName (type: ${contentType ?? 'auto'})');
+
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('cases_evidence')
+          .child(user.uid) // Store per-user for easier Storage rules scoping
+          .child(uniqueFileName);
+      
+      // 5. Use SettableMetadata to ensure proper content-type is set on the object
+      final metadata = contentType != null 
+          ? SettableMetadata(contentType: contentType)
+          : null;
+
+      // 6. Upload using putFile (more reliable than putData for file paths on Android)
+      final UploadTask uploadTask = metadata != null 
+          ? ref.putFile(file, metadata) 
+          : ref.putFile(file);
+      
+      final TaskSnapshot snapshot = await uploadTask;
       
       if (snapshot.state == TaskState.success) {
-        return await ref.getDownloadURL();
+        debugPrint('Upload success. Getting download URL...');
+        final url = await snapshot.ref.getDownloadURL();
+        debugPrint('Got URL: $url');
+        return url;
       } else {
-        throw Exception("Upload failed: TaskState is ${snapshot.state}");
+        throw Exception('Upload did not complete. State: ${snapshot.state}');
       }
+    } on FirebaseException catch (e) {
+      debugPrint('Firebase Storage Error [${e.code}]: ${e.message}');
+      if (e.code == 'unauthorized' || e.code == 'permission-denied') {
+        throw Exception('Permission denied. Check Firebase Storage security rules.');
+      } else if (e.code == 'object-not-found') {
+        debugPrint('File uploaded but URL not found. Falling back to local file URI.');
+        return 'local://${file.path}';
+      } else if (e.code == 'canceled') {
+        throw Exception('Upload was cancelled.');
+      }
+      rethrow;
     } catch (e) {
-      debugPrint("Firebase Storage Upload Error: $e");
+      debugPrint('General Upload Error: $e');
       rethrow;
     }
   }

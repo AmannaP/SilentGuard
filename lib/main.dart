@@ -15,6 +15,9 @@ import 'screens/call_screen.dart';
 import 'screens/contacts_screen.dart';
 import 'screens/rep_dashboard.dart';
 import 'screens/chat_provider_screen.dart';
+import 'screens/about_app_page.dart';
+import 'screens/help_support_page.dart';
+import 'screens/admin_feedback_screen.dart';
 import 'services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -42,7 +45,7 @@ class SilentGuardApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFCD7F32)),
       ),
       // Set the starting page
-      home: const SilentGuardRoot(),
+      home: const LandingPage(),
       routes: {
         '/landing_page': (context) => const LandingPage(),
         '/login_page': (context) => const LoginPage(),
@@ -61,6 +64,9 @@ class SilentGuardApp extends StatelessWidget {
            final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
            return ChatProviderScreen(providerData: args);
         },
+        '/about_app': (context) => const AboutAppPage(),
+        '/help_support': (context) => const HelpSupportPage(),
+        '/admin_feedback': (context) => const AdminFeedbackScreen(),
       },
     );
   }

@@ -4,6 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/tracking_service.dart';
 import '../services/auth_service.dart';
+import '../services/notification_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadUser() async {
     final user = AuthService().currentUser;
     if (user != null) {
+      NotificationService().startListeningForMessages(user.uid);
       final doc = await AuthService().getUserData(user.uid);
       if (doc.exists && mounted) {
         setState(() {
@@ -190,13 +194,55 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () => Navigator.pushNamed(context, '/record_evidence_screen'),
                   ),
                   const SizedBox(width: 5),
-                  IconButton(
-                    icon: const Icon(Icons.notifications_none_outlined, size: 28),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No new notifications')),
+                  StreamBuilder<DocumentSnapshot>(
+                    stream: FirebaseAuth.instance.currentUser?.uid != null 
+                        ? FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).snapshots()
+                        : null,
+                    builder: (context, snapshot) {
+                      bool hasUnread = false;
+                      if (snapshot.hasData && snapshot.data!.exists) {
+                        final data = snapshot.data!.data() as Map<String, dynamic>?;
+                        hasUnread = data?['hasUnreadNotifications'] ?? false;
+                      }
+                      
+                      return Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.notifications_none_outlined, size: 28),
+                            onPressed: () async {
+                              final uid = FirebaseAuth.instance.currentUser?.uid;
+                              if (uid != null && hasUnread) {
+                                await FirebaseFirestore.instance.collection('users').doc(uid).update({
+                                  'hasUnreadNotifications': false
+                                });
+                              }
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(hasUnread 
+                                      ? 'Open your Chats or Case History to view new updates.' 
+                                      : 'No new notifications'),
+                                    backgroundColor: hasUnread ? const Color(0xFFCD7F32) : null,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                          if (hasUnread)
+                            Positioned(
+                              right: 12,
+                              top: 12,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                        ],
                       );
-                    },
+                    }
                   ),
                 ],
               ),

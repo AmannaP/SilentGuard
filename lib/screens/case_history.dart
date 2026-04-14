@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/case_history.dart'; 
 import 'case_screens.dart';
@@ -103,13 +104,23 @@ class _CaseHistoryState extends State<CaseHistory> {
             // Live List of Cases
             Expanded(
               child: StreamBuilder<List<CaseModel>>(
-                stream: _service.getCasesStream(),
+                stream: _service.getCasesStream(userId: FirebaseAuth.instance.currentUser?.uid),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Colors.white));
                   }
-                  if (snapshot.hasError) {
-                    return const Center(child: Text('Connectivity Error. Please check wifi.', style: TextStyle(color: Colors.white)));
+                   if (snapshot.hasError) {
+                    debugPrint('Firestore Stream Error: ${snapshot.error}');
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Text(
+                          'Error: ${snapshot.error}', 
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
                   }
                   final cases = _filter(snapshot.data ?? []);
                   if (cases.isEmpty) {
@@ -685,6 +696,7 @@ class _NewCasePageState extends State<NewCasePage> {
         description: _description,
         immediateNeeds: needs,
         media: _uploadedMedia,
+        userId: FirebaseAuth.instance.currentUser?.uid,
       );
 
       await _service.createCase(newCase);

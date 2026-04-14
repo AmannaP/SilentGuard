@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../services/case_history.dart';
 import 'admin_map_tracking_screen.dart';
 import 'admin_case_detail_screen.dart';
+import 'admin_messages_screen.dart';
 
 class RepDashboard extends StatefulWidget {
   const RepDashboard({super.key});
@@ -55,6 +56,13 @@ class _RepDashboardState extends State<RepDashboard> {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
+            icon: const Icon(Icons.message, color: Colors.white),
+            tooltip: 'Messages',
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminMessagesScreen()));
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             tooltip: 'Sign Out',
             onPressed: _logout,
@@ -74,6 +82,12 @@ class _RepDashboardState extends State<RepDashboard> {
                   _buildSidebarItem(Icons.dashboard, 'Dashboard', true),
                   _buildSidebarItem(Icons.emergency, 'Active SOS', false),
                   _buildSidebarItem(Icons.history, 'Cases', false),
+                  _buildSidebarItem(Icons.message, 'Messages', false, onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminMessagesScreen()));
+                  }),
+                  _buildSidebarItem(Icons.feedback_outlined, 'Feedback', false, onTap: () {
+                    Navigator.pushNamed(context, '/admin_feedback');
+                  }),
                   const Spacer(),
                   const Padding(
                     padding: EdgeInsets.all(16),
@@ -128,7 +142,7 @@ class _RepDashboardState extends State<RepDashboard> {
     );
   }
 
-  Widget _buildSidebarItem(IconData icon, String label, bool isSelected) {
+  Widget _buildSidebarItem(IconData icon, String label, bool isSelected, {VoidCallback? onTap}) {
     return ListTile(
       leading: Icon(icon, color: isSelected ? _bronze : Colors.grey),
       title: Text(
@@ -138,7 +152,7 @@ class _RepDashboardState extends State<RepDashboard> {
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
-      onTap: () {},
+      onTap: onTap ?? () {},
     );
   }
 

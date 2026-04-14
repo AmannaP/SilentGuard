@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/case_history.dart';
-import '../services/archive_service.dart';
+import '../services/local_evidence_service.dart';
 
 class RecordEvidenceScreen extends StatefulWidget {
   const RecordEvidenceScreen({super.key});
@@ -17,8 +16,7 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
   late final AudioRecorder _audioRecorder;
   bool _isRecording = false;
   bool _isUploading = false;
-  final CaseService _caseService = CaseService();
-  final ArchiveService _archiveService = ArchiveService();
+  final LocalEvidenceService _evidenceService = LocalEvidenceService();
 
   @override
   void initState() {
@@ -68,35 +66,23 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
           _isRecording = false;
         });
         
-        if (path != null) {
+          if (path != null) {
           setState(() => _isUploading = true);
-
           try {
-            File file = File(path);
-            String fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+            final File file = File(path);
+            final String fileName = 'voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+            await _evidenceService.saveEvidenceFromFile(file, fileName, 'audio');
 
-            String downloadUrl = await _caseService.uploadEvidence(file, fileName);
-            
-            if (downloadUrl.isNotEmpty) {
-              await _archiveService.saveEvidence(fileName, 'audio', downloadUrl);
-              
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Audio recorded successfully and saved to vault!')),
-                );
-                Navigator.pop(context, path);
-              }
-            } else {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Verification Failed: Could not acquire URL')),
-                );
-              }
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('✓ Audio saved to your Evidence Vault!')),
+              );
+              Navigator.pop(context, path);
             }
           } catch (e) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Upload Error: $e')),
+                SnackBar(content: Text('Save Error: $e')),
               );
             }
           } finally {
@@ -116,31 +102,20 @@ class _RecordEvidenceScreenState extends State<RecordEvidenceScreen> {
       if (video != null) {
          setState(() => _isUploading = true);
          try {
-            File file = File(video.path);
-            String fileName = 'video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+            final File file = File(video.path);
+            final String fileName = 'video_${DateTime.now().millisecondsSinceEpoch}.mp4';
+            await _evidenceService.saveEvidenceFromFile(file, fileName, 'video');
 
-            String downloadUrl = await _caseService.uploadEvidence(file, fileName);
-            
-            if (downloadUrl.isNotEmpty) {
-              await _archiveService.saveEvidence(fileName, 'video', downloadUrl);
-              
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Video recorded securely and saved to vault!')),
-                );
-                Navigator.pop(context, video.path);
-              }
-            } else {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Verification Failed: Could not acquire URL')),
-                );
-              }
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('✓ Video saved to your Evidence Vault!')),
+              );
+              Navigator.pop(context, video.path);
             }
          } catch (e) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Upload Error: $e')),
+                SnackBar(content: Text('Save Error: $e')),
               );
             }
          } finally {

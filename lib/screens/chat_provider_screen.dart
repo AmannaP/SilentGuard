@@ -30,9 +30,18 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
   void initState() {
     super.initState();
     final providerId = widget.providerData['uid'];
-    final participants = [_currentUserId, providerId];
-    participants.sort();
-    _chatRoomId = participants.join('_');
+    final bool isAdmin = widget.providerData['isAdmin'] == true;
+    
+    // If an admin is using this screen to reply to a user, the room is formed by [victim_uid, 'renel_ghana_default']
+    if (isAdmin) {
+      final participants = [providerId, 'renel_ghana_default'];
+      participants.sort();
+      _chatRoomId = participants.join('_');
+    } else {
+      final participants = [_currentUserId, providerId];
+      participants.sort();
+      _chatRoomId = participants.join('_');
+    }
   }
 
   void _sendMessage({String text = '', String imageUrl = ''}) async {
@@ -40,16 +49,45 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
 
     _messageController.clear();
     try {
+      final bool isAdmin = widget.providerData['isAdmin'] == true;
+      final String actualSenderId = isAdmin ? 'renel_ghana_default' : _currentUserId;
+
+      final messageData = {
+        'text': text,
+        'imageUrl': imageUrl,
+        'senderId': actualSenderId,
+        'timestamp': FieldValue.serverTimestamp(),
+      };
+      
+      // 1. Add Message
       await FirebaseFirestore.instance
           .collection('chats')
           .doc(_chatRoomId)
           .collection('messages')
-          .add({
-        'text': text,
-        'imageUrl': imageUrl,
-        'senderId': _currentUserId,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+          .add(messageData);
+          
+      // 2. Update Chat Metadata (for Admin List View)
+      await FirebaseFirestore.instance
+          .collection('chats')
+          .doc(_chatRoomId)
+          .set({
+        'participants': [_currentUserId, widget.providerData['uid']],
+        'lastMessage': text.isNotEmpty ? text : 'Sent an attachment',
+        'lastMessageTime': FieldValue.serverTimestamp(),
+        'userId': _currentUserId == widget.providerData['uid'] ? 'renel_ghana_default' : _currentUserId, 
+        // Note: userId tracks the victim's id easily for admin lookup
+      }, SetOptions(merge: true));
+
+      // 3. Trigger Global Notification Badge for Receiver
+      String receiverId = _currentUserId == widget.providerData['uid'] 
+          ? _chatRoomId.replaceAll(_currentUserId, '').replaceAll('_', '')
+          : widget.providerData['uid'];
+          
+      if (receiverId.isNotEmpty) {
+         await FirebaseFirestore.instance.collection('users').doc(receiverId).set({
+           'hasUnreadNotifications': true,
+         }, SetOptions(merge: true));
+      }
     } catch (e) {
       debugPrint("Failed to send message: $e");
     }

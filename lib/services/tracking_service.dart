@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
+import 'auth_service.dart';
 
 class TrackingService {
   // Use a getter so it only accesses Firestore when needed
@@ -10,6 +11,9 @@ class TrackingService {
   }
 
   Future<String> triggerSOS(Position position, {String? userName}) async {
+    final authService = AuthService();
+    final uid = authService.currentUser?.uid ?? 'unknown';
+
     DocumentReference docRef = await _firestore.collection('tracking').add({
       'user': {
         'lat': position.latitude,
@@ -19,7 +23,7 @@ class TrackingService {
       'status': 'emergency',
       'timestamp': FieldValue.serverTimestamp(),
       'displayDate': DateTime.now().toString().substring(0, 16), // "2024-04-12 12:05"
-      'userId': 'demo_user',
+      'userId': uid,
     });
     return docRef.id;
   }
