@@ -35,12 +35,12 @@ class _ProfilePageState extends State<ProfilePage> {
          if (doc.exists) {
             final data = doc.data() as Map<String, dynamic>;
             if (mounted) {
-              setState(() {
-                 _fullName = data['fullName'] ?? 'Unknown User';
-                 _email = data['email'] ?? 'Unknown Email';
-                 _photoUrl = data['photoUrl'] ?? '';
-                 _phoneNumber = data['phoneNumber'] ?? '';
-              });
+               setState(() {
+                  _fullName = data['fullName'] ?? data['name'] ?? 'Unknown User';
+                  _email = data['email'] ??  AuthService().currentUser?.email ?? 'Unknown Email';
+                  _photoUrl = data['photoUrl'] ?? '';
+                  _phoneNumber = data['phoneNumber'] ?? data['phone'] ?? '';
+               });
             }
           } else {
              if (mounted) setState(() { _fullName = 'User not found'; _email = 'Check connection'; });
@@ -67,7 +67,16 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       final ref = FirebaseStorage.instance.ref().child('profile_pics').child('$uid.jpg');
       await ref.putFile(File(image.path));
-      final url = await ref.getDownloadURL();
+      String url;
+      try {
+        url = await ref.getDownloadURL();
+      } on FirebaseException catch (e) {
+        if (e.code == 'object-not-found') {
+          url = 'local://${image.path}';
+        } else {
+          rethrow;
+        }
+      }
       
       await AuthService().updateUserData(uid, {'photoUrl': url});
       setState(() => _photoUrl = url);
@@ -136,7 +145,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       CircleAvatar(
                         radius: 35,
                         backgroundColor: Colors.white24,
-                        backgroundImage: _photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null,
+                        backgroundImage: _photoUrl.isNotEmpty 
+                           ? (_photoUrl.startsWith('local://') 
+                               ? FileImage(File(_photoUrl.replaceFirst('local://', ''))) 
+                               : NetworkImage(_photoUrl)) as ImageProvider
+                           : null,
                         child: _photoUrl.isEmpty ? const Icon(Icons.person, size: 40, color: Colors.white54) : null,
                       ),
                       if (_isUploading) const CircularProgressIndicator(color: Colors.white),
