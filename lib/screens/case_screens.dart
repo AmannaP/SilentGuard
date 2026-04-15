@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import '../services/case_history.dart';
 import '../utils/ui_utils.dart';
 import '../widgets/chat_widgets.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'call_screen.dart';
 
 // ─────────────────────────────────────────────
@@ -169,11 +170,8 @@ class _CaseChatScreenState extends State<CaseChatScreen> {
             isUploading: _isUploading,
             onSend: () => _sendMessage(text: _messageController.text.trim()),
             onPickImage: _pickAndUploadImage,
-            onCallTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const CallScreen()),
-              );
+            onCallTap: () async {
+              await FlutterPhoneDirectCaller.callNumber('0530917605');
             },
           ),
         ],

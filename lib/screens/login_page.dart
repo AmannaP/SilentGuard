@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../utils/ui_utils.dart';
+import '../utils/validators.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final Color _themeOrange = const Color(0xFFD4833B);
@@ -52,14 +54,25 @@ class _LoginPageState extends State<LoginPage> {
                 "Please Login to Continue.",
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
-              const SizedBox(height: 50),
-
-              // Reusing your white field style
-              _buildLoginField("Email", _emailController),
-              _buildLoginField(
-                "Password",
-                _passwordController,
-                isPassword: true,
+              // Form container
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildLoginField(
+                      "Email",
+                      _emailController,
+                      validator: Validators.email,
+                    ),
+                    _buildLoginField(
+                      "Password",
+                      _passwordController,
+                      isPassword: true,
+                      validator: (v) => Validators.required(v, 'Password'),
+                    ),
+                  ],
+                ),
               ),
 
               Align(
@@ -113,13 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.center,
                 child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : TextButton(
                   onPressed: () async {
-                    if (_emailController.text.trim().isEmpty || _passwordController.text.trim().isEmpty) {
-                      UIUtils.showCustomPopup(
-                        context,
-                        title: 'Fields Required',
-                        message: 'Please fill out both email and password fields.',
-                        isSuccess: false,
-                      );
+                    if (!_formKey.currentState!.validate()) {
                       return;
                     }
                     setState(() => _isLoading = true);
@@ -179,6 +186,7 @@ class _LoginPageState extends State<LoginPage> {
     String label,
     TextEditingController controller, {
     bool isPassword = false,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,9 +199,11 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
           controller: controller,
           obscureText: isPassword && !_isPasswordVisible,
+          validator: validator,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

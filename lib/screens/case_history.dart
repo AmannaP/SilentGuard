@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/case_history.dart'; 
+import '../utils/validators.dart';
 import 'case_screens.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -754,7 +755,8 @@ class _NewCasePageState extends State<NewCasePage> {
                   
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Full Name *', border: OutlineInputBorder()),
-                    validator: (v) => v!.isEmpty ? 'Please enter a name' : null,
+                    validator: (v) => Validators.name(v, 'Full Name'),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     onSaved: (v) => _victimName = v!,
                   ),
                   const SizedBox(height: 16),
@@ -784,7 +786,8 @@ class _NewCasePageState extends State<NewCasePage> {
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Contact Number *', border: OutlineInputBorder()),
                     keyboardType: TextInputType.phone,
-                    validator: (v) => v!.isEmpty ? 'Please enter contact number' : null,
+                    validator: Validators.phone,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     onSaved: (v) => _victimPhone = v!,
                   ),
                   const SizedBox(height: 16),

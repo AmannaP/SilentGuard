@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import '../services/auth_service.dart';
 import '../utils/ui_utils.dart';
+import '../utils/validators.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -95,15 +96,29 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _showEditDialog(String title, String field, String currentValue) {
     final controller = TextEditingController(text: currentValue);
+    final formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Edit $title'),
-        content: TextField(controller: controller, decoration: InputDecoration(hintText: 'Enter $title')),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller, 
+            decoration: InputDecoration(hintText: 'Enter $title'),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (v) {
+              if (field == 'phoneNumber') return Validators.phone(v);
+              if (field == 'fullName') return Validators.name(v, 'Name');
+              return Validators.required(v, title);
+            },
+          ),
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () async {
+              if (!formKey.currentState!.validate()) return;
               final uid = AuthService().currentUser?.uid;
               if (uid != null) {
                 await AuthService().updateUserData(uid, {field: controller.text.trim()});

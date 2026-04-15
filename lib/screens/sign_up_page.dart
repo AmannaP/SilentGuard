@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../utils/ui_utils.dart';
+import '../utils/validators.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -10,6 +11,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final _formKey = GlobalKey<FormState>();
   final PageController _pageController = PageController();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
@@ -90,10 +92,13 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
 
             Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [_buildPageOne(), _buildPageTwo()],
+              child: Form(
+                key: _formKey,
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [_buildPageOne(), _buildPageTwo()],
+                ),
               ),
             ),
           ],
@@ -107,15 +112,16 @@ class _SignUpPageState extends State<SignUpPage> {
       padding: const EdgeInsets.fromLTRB(30, 20, 30, 100),
       child: Column(
         children: [
-          _buildTextField("First Name", _firstNameController),
-          _buildTextField("Last Name", _lastNameController),
-          _buildTextField("Email", _emailController),
-          _buildTextField("Contact Number", _phoneController),
+          _buildTextField("First Name", _firstNameController, validator: (v) => Validators.name(v, 'First Name')),
+          _buildTextField("Last Name", _lastNameController, validator: (v) => Validators.name(v, 'Last Name')),
+          _buildTextField("Email", _emailController, validator: Validators.email),
+          _buildTextField("Contact Number", _phoneController, validator: Validators.phone),
           _buildTextField(
             "Password", 
             _passwordController, 
             isPassword: true, 
             isObscured: !_isPasswordVisible, 
+            validator: (v) => Validators.required(v, 'Password'),
             onToggleVisibility: () => setState(() => _isPasswordVisible = !_isPasswordVisible)
           ),
           _buildTextField(
@@ -123,16 +129,24 @@ class _SignUpPageState extends State<SignUpPage> {
             _confirmPasswordController, 
             isPassword: true, 
             isObscured: !_isConfirmPasswordVisible, 
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Please confirm your password';
+              if (v != _passwordController.text) return 'Passwords do not match';
+              return null;
+            },
             onToggleVisibility: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible)
           ),
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () => _pageController.nextPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              ),
+              onPressed: () {
+                // Pre-validation before paging maybe? Or just paging
+                _pageController.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              },
               child: const Text(
                 "Next >",
                 style: TextStyle(color: Colors.white, fontSize: 18),
@@ -150,10 +164,10 @@ class _SignUpPageState extends State<SignUpPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTextField("Occupation", _occupationController),
+          _buildTextField("Occupation", _occupationController, validator: (v) => Validators.required(v, 'Occupation')),
           _buildRegionDropdown(),
-          _buildTextField("Emergency Contact", _emergencyContactController),
-          _buildTextField("Emergency Contact Name", _emergencyNameController),
+          _buildTextField("Emergency Contact", _emergencyContactController, validator: Validators.phone),
+          _buildTextField("Emergency Contact Name", _emergencyNameController, validator: (v) => Validators.name(v, 'Emergency Contact Name')),
 
           const SizedBox(height: 15),
           const Text(
@@ -192,12 +206,14 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               _isLoading ? const CircularProgressIndicator(color: Colors.white) : TextButton(
                 onPressed: () async {
-                  // Perform basic validation before finishing
-                  if (_firstNameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty || _phoneController.text.isEmpty) {
+                  if (!_formKey.currentState!.validate()) {
+                    return;
+                  }
+                  if (_selectedRegion == null || _selectedGender == null || _selectedMaritalStatus == null) {
                     UIUtils.showCustomPopup(
                       context,
-                      title: 'Missing Fields',
-                      message: 'Please fill in all required fields on both pages.',
+                      title: 'Missing Selection',
+                      message: 'Please make sure all dropdowns and options are selected.',
                       isSuccess: false,
                     );
                     return;
@@ -253,15 +269,17 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController? controller, {bool isPassword = false, bool? isObscured, VoidCallback? onToggleVisibility}) {
+  Widget _buildTextField(String label, TextEditingController? controller, {bool isPassword = false, bool? isObscured, VoidCallback? onToggleVisibility, String? Function(String?)? validator}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
         const SizedBox(height: 5),
-        TextField(
+        TextFormField(
           controller: controller,
           obscureText: isObscured ?? isPassword,
+          validator: validator,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
@@ -113,9 +114,29 @@ class _CallScreenState extends State<CallScreen> {
                         value: 'save',
                         child: Text('Save Contact'),
                       ),
+                      const PopupMenuItem(
+                        value: 'copy',
+                        child: Text('Copy'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'paste',
+                        child: Text('Paste'),
+                      ),
                     ],
-                    onSelected: (val) {
-                      if (val == 'clear') setState(() => _dialValue = '');
+                    onSelected: (val) async {
+                      if (val == 'clear') {
+                        setState(() => _dialValue = '');
+                      } else if (val == 'copy' && _dialValue.isNotEmpty) {
+                        await Clipboard.setData(ClipboardData(text: _dialValue));
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
+                        }
+                      } else if (val == 'paste') {
+                        final ClipboardData? data = await Clipboard.getData('text/plain');
+                        if (data != null && data.text != null) {
+                          setState(() => _dialValue = data.text!);
+                        }
+                      }
                     },
                   ),
                 ],

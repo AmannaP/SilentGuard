@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../services/auth_service.dart';
 import '../services/case_history.dart';
 import '../services/notification_service.dart';
@@ -217,8 +218,8 @@ class _ChatProviderScreenState extends State<ChatProviderScreen> {
             onSend: () => _sendMessage(text: _messageController.text.trim()),
             onPickImage: () => _pickAndUploadImage(fromCamera: false),
             onCaptureImage: () => _pickAndUploadImage(fromCamera: true),
-            onCallTap: () {
-              Navigator.pushNamed(context, '/call_screen');
+            onCallTap: () async {
+              await FlutterPhoneDirectCaller.callNumber('0530917605');
             },
           ),
         ],
