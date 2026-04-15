@@ -23,6 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isTriggering = false;
   String? _activeRequestId;
   String _userName = "User";
+  String _emergencyName = "";
+  String _emergencyPhone = "";
 
   @override
   void initState() {
@@ -36,10 +38,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = AuthService().currentUser;
     if (user != null) {
       NotificationService().startListeningForMessages(user.uid);
+      
+      // Sync active SOS from Firestore in case local storage is lost
+      final activeId = await _trackingService.getActiveSOS(user.uid);
+      if (activeId != null && mounted) {
+        setState(() => _activeRequestId = activeId);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('active_sos_id', activeId);
+      }
+
       final doc = await AuthService().getUserData(user.uid);
       if (doc.exists && mounted) {
+        final data = doc.data() as Map<String, dynamic>;
         setState(() {
-          _userName = (doc.data() as Map<String, dynamic>)['fullName'] ?? 'User';
+          _userName = data['fullName'] ?? 'User';
+          _emergencyName = data['emergencyName'] ?? '';
+          _emergencyPhone = data['emergencyPhone'] ?? '';
         });
       }
     }
@@ -100,6 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final requestId = await _trackingService.triggerSOS(
         _currentPosition!, 
         userName: _userName,
+        emergencyName: _emergencyName,
+        emergencyPhone: _emergencyPhone,
       );
       debugPrint("SOS Triggered! Request ID: $requestId");
 
@@ -264,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Are you in an\nemergency?",
+                                "Are you in danger?",
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,

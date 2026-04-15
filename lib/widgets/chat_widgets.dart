@@ -205,6 +205,10 @@ class UnifiedChatInputBar extends StatelessWidget {
                     icon: const Icon(Icons.camera_alt_outlined, color: Colors.grey),
                     onPressed: onCaptureImage,
                   ),
+                IconButton(
+                  icon: const Icon(Icons.phone_outlined, color: Colors.grey, size: 22),
+                  onPressed: onCallTap,
+                ),
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(

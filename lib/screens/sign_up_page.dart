@@ -235,6 +235,8 @@ class _SignUpPageState extends State<SignUpPage> {
                       password: _passwordController.text.trim(),
                       fullName: '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}',
                       phoneNumber: _phoneController.text.trim(),
+                      emergencyName: _emergencyNameController.text.trim(),
+                      emergencyPhone: _emergencyContactController.text.trim(),
                     );
                     if (mounted) {
                       UIUtils.showCustomPopup(

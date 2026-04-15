@@ -15,7 +15,7 @@ class CallScreen extends StatefulWidget {
 
 class _CallScreenState extends State<CallScreen> {
   String _dialValue = '';
-  final String _defaultEmergencyNumber = '112'; // Default emergency/help desk number
+  final String _defaultEmergencyNumber = '0530917605'; // Renel support number
 
   void _appendDigit(String digit) {
     setState(() => _dialValue += digit);

@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/tracking_service.dart';
 import '../services/case_history.dart';
@@ -31,6 +32,9 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
 
   StreamSubscription<Position>? _positionStream;
   StreamSubscription<DocumentSnapshot>? _requestSubscription;
+  Timer? _autoResponseTimer;
+  Timer? _movementTimer;
+  double _moveProgress = 0.0;
 
   @override
   void didChangeDependencies() {
@@ -50,6 +54,8 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
   void dispose() {
     _positionStream?.cancel();
     _requestSubscription?.cancel();
+    _autoResponseTimer?.cancel();
+    _movementTimer?.cancel();
     _userLocationController.dispose();
     super.dispose();
   }
@@ -85,22 +91,83 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
         final data = doc.data() as Map<String, dynamic>?;
         if (data == null) return;
 
+        final status = data['status'] ?? 'emergency';
+
         if (mounted) {
           setState(() {
             if (data['helper'] != null) {
               helperLatLng = LatLng(data['helper']['lat'], data['helper']['lng']);
               _etaText = data['eta'] ?? "Help is on the way";
+              
+              // If help is on the way, stop the auto-response timer but start movement if not already moving
+              _autoResponseTimer?.cancel();
+              if (_movementTimer == null) _startSimulatedMovement();
             } else {
               _etaText = "Finding nearest help...";
+              // Start auto-response timer if we're just waiting
+              if (status == 'emergency' && _autoResponseTimer == null) {
+                _startAutoResponseTimer();
+              }
             }
             
-            if (data['status'] == 'resolved' || data['status'] == 'cancelled') {
-              _showCompletionDialog(data['status']);
+            if (status == 'resolved' || status == 'cancelled') {
+              _showCompletionDialog(status);
             }
           });
         }
       });
     }
+  }
+
+  void _startAutoResponseTimer() {
+    _autoResponseTimer = Timer(const Duration(seconds: 5), () async {
+      if (requestId != null && helperLatLng == null && mounted) {
+        debugPrint("Auto-simulating helper response...");
+        final startLat = (userLatLng?.latitude ?? 5.6037) + 0.02;
+        final startLng = (userLatLng?.longitude ?? -0.1870) + 0.02;
+        
+        await FirebaseFirestore.instance.collection('tracking').doc(requestId).update({
+          'status': 'help_on_the_way',
+          'helper': {'lat': startLat, 'lng': startLng},
+          'eta': 'Calculating ETA...',
+        });
+      }
+    });
+  }
+
+  void _startSimulatedMovement() {
+    _movementTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (requestId == null || userLatLng == null || helperLatLng == null || !mounted) {
+        timer.cancel();
+        return;
+      }
+
+      _moveProgress += 0.1;
+      if (_moveProgress >= 1.0) {
+        timer.cancel();
+        await FirebaseFirestore.instance.collection('tracking').doc(requestId).update({
+          'status': 'resolved',
+          'eta': 'Help has arrived',
+        });
+        return;
+      }
+
+      // Linear interpolation towards user
+      final newLat = helperLatLng!.latitude + (userLatLng!.latitude - helperLatLng!.latitude) * 0.2;
+      final newLng = helperLatLng!.longitude + (userLatLng!.longitude - helperLatLng!.longitude) * 0.2;
+      
+      final distance = Geolocator.distanceBetween(
+        newLat, newLng, userLatLng!.latitude, userLatLng!.longitude
+      );
+      
+      String eta = "${(distance / 200).ceil()} mins away";
+      if (distance < 100) eta = "Arriving now";
+
+      await FirebaseFirestore.instance.collection('tracking').doc(requestId).update({
+        'helper': {'lat': newLat, 'lng': newLng},
+        'eta': eta,
+      });
+    });
   }
 
   void _showCompletionDialog(String status) async {
@@ -382,11 +449,8 @@ class _MapTrackingScreenState extends State<MapTrackingScreen> {
 
   Widget _buildCallButton(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const CallScreen()),
-        );
+      onTap: () async {
+        await FlutterPhoneDirectCaller.callNumber('0530917605');
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),

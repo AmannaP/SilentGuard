@@ -10,7 +10,7 @@ class TrackingService {
     return _firestore.collection('tracking').doc(requestId).snapshots();
   }
 
-  Future<String> triggerSOS(Position position, {String? userName}) async {
+  Future<String> triggerSOS(Position position, {String? userName, String? emergencyName, String? emergencyPhone}) async {
     final authService = AuthService();
     final uid = authService.currentUser?.uid ?? 'unknown';
 
@@ -20,12 +20,33 @@ class TrackingService {
         'lng': position.longitude,
       },
       'userName': userName ?? 'Anonymous User',
+      'emergencyContact': {
+        'name': emergencyName ?? 'None',
+        'phone': emergencyPhone ?? 'None',
+      },
       'status': 'emergency',
       'timestamp': FieldValue.serverTimestamp(),
       'displayDate': DateTime.now().toString().substring(0, 16), // "2024-04-12 12:05"
       'userId': uid,
     });
     return docRef.id;
+  }
+
+  /// Finds an active SOS request for the user in Firestore.
+  /// Returns the document ID if found, otherwise null.
+  Future<String?> getActiveSOS(String uid) async {
+    final query = await _firestore
+        .collection('tracking')
+        .where('userId', isEqualTo: uid)
+        .where('status', whereIn: ['emergency', 'help_on_the_way'])
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+
+    if (query.docs.isNotEmpty) {
+      return query.docs.first.id;
+    }
+    return null;
   }
 
   Future<void> updateUserLocation(String requestId, Position position) async {

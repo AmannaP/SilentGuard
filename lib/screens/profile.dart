@@ -21,6 +21,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String _phoneNumber = "";
   String _photoUrl = "";
   bool _isUploading = false;
+  String _emergencyName = "";
+  String _emergencyPhone = "";
 
   @override
   void initState() {
@@ -41,6 +43,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   _email = data['email'] ??  AuthService().currentUser?.email ?? 'Unknown Email';
                   _photoUrl = data['photoUrl'] ?? '';
                   _phoneNumber = data['phoneNumber'] ?? data['phone'] ?? '';
+                  _emergencyName = data['emergencyName'] ?? '';
+                  _emergencyPhone = data['emergencyPhone'] ?? '';
                });
             }
           } else {
@@ -221,6 +225,18 @@ class _ProfilePageState extends State<ProfilePage> {
                     "Phone Number",
                     sub: _phoneNumber.isEmpty ? "Add your phone number" : _phoneNumber,
                     onTap: () => _showEditDialog('Phone Number', 'phoneNumber', _phoneNumber),
+                  ),
+                  _buildMenuItem(
+                    Icons.contact_phone_outlined,
+                    "Emergency Contact",
+                    sub: _emergencyName.isEmpty ? "Add emergency name" : _emergencyName,
+                    onTap: () => _showEditDialog('Emergency Name', 'emergencyName', _emergencyName),
+                  ),
+                  _buildMenuItem(
+                    Icons.phone_android_outlined,
+                    "Emergency Phone",
+                    sub: _emergencyPhone.isEmpty ? "Add emergency phone" : _emergencyPhone,
+                    onTap: () => _showEditDialog('Emergency Phone', 'emergencyPhone', _emergencyPhone),
                   ),
                   _buildMenuItem(
                     Icons.lock_outline,
