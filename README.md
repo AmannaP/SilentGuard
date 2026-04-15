@@ -168,7 +168,7 @@ lib/
 
 ## 🤝 Partners
 
-Built for **Renel Ghana** — an NGO dedicated to combating gender-based violence in Ghana.
+Built with love in Partnership with **Renel Ghana** — an NGO dedicated to combating gender-based violence in Ghana.
 
 ---
 
